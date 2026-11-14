@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JAPA · Ofertas de videojuegos</title>
+  <meta name="description" content="Mejores precios de videojuegos entre tiendas, con Metacritic y HowLongToBeat. Se actualiza automáticamente.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23355C7D'/><text x='50' y='74' text-anchor='middle' font-family='Arial Black,Arial' font-weight='900' font-size='70' fill='%23F8B195'>J</text></svg>">
+  <!-- Para usar una fuente de Google Fonts (ej. Poppins): quitar los signos de comentario de la línea siguiente
+       y en styles.css poner  --fuente: "Poppins", sans-serif;
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap">
+  -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="marca">
+      <h1 class="logo">JAPA</h1>
+      <p class="sub">El mejor precio de cada juego entre varias tiendas</p>
+    </div>
+    <div class="meta-datos" id="metaDatos" aria-live="polite">Cargando datos…</div>
+  </header>
+
+  <section class="controles" aria-label="Filtros y orden">
+    <fieldset class="campo selector" id="fMostrar">
+      <legend>Mostrar</legend>
+      <div class="opciones">
+        <label><input type="radio" name="mostrar" value="todos" checked><span>Todos los juegos</span></label>
+        <label><input type="radio" name="mostrar" value="ofertas"><span>Solo ofertas</span></label>
+      </div>
+    </fieldset>
+    <label class="campo buscar">
+      <span>Buscar</span>
+      <input id="fBuscar" type="search" placeholder="Nombre del juego…" autocomplete="off">
+    </label>
+    <label class="campo"><span>Tipo de juego</span><select id="fTipo"><option value="">Todos</option></select></label>
+    <label class="campo"><span>Plataforma</span><select id="fPlataforma"><option value="">Todas</option></select></label>
+    <label class="campo"><span>Formato</span><select id="fFormato"><option value="">Todos</option></select></label>
+    <label class="campo"><span>Tienda</span><select id="fTienda"><option value="">Todas</option></select></label>
+    <label class="campo">
+      <span>Ordenar por</span>
+      <select id="fOrden">
+        <option value="descuento-desc">% descuento (mayor a menor)</option>
+        <option value="descuento-asc">% descuento (menor a mayor)</option>
+        <option value="precio-asc">Precio (menor a mayor)</option>
+        <option value="precio-desc">Precio (mayor a menor)</option>
+        <option value="metacritic-desc">Metacritic (mayor a menor)</option>
+        <option value="metacritic-asc">Metacritic (menor a mayor)</option>
+        <option value="nombre-asc">Nombre (A → Z)</option>
+        <option value="nombre-desc">Nombre (Z → A)</option>
+      </select>
+    </label>
+    <button id="btnLimpiar" class="btn-sec" type="button">Limpiar</button>
+  </section>
+
+  <p class="conteo" id="conteo"></p>
+  <main id="grid" class="grid" aria-live="polite"></main>
+
+  <dialog id="detalle" aria-labelledby="dTitulo">
+    <button class="cerrar" id="btnCerrar" type="button" aria-label="Cerrar">×</button>
+    <div id="detalleCuerpo"></div>
+  </dialog>
+
+  <footer class="pie">
+    <p id="pieEjecucion"></p>
+    <p>Precios en USD. Datos obtenidos con web scraping paralelo (IC3101 Arquitectura de Computadoras, TEC San Carlos).
+       Sin datos: <strong>N/D</strong>.</p>
+    <p>Fuentes: Steam, Epic Games Store (vía <a href="https://www.cheapshark.com/" target="_blank" rel="noopener noreferrer">CheapShark</a>), Nintendo eShop y Eneba (precios) · Metacritic (calificaciones) ·
+       tiempos de juego: Fuente: <a href="https://howlongtobeat.com/" target="_blank" rel="noopener noreferrer">HowLongToBeat</a>.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
