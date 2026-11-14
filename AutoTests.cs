@@ -286,6 +286,39 @@ public static class AutoTests
             Verificar(!r.Ok && r.Error == TipoError.Bloqueo, "403 -> bloqueo");
         }
 
+        Console.WriteLine("== Steam y nombres (correcciones con datos reales) ==");
+        {
+            // Datos reales: la versión original de Ori ya no se vende; la Definitive Edition sí. Antes se rendía en la primera.
+            const string busqueda = "{\"total\":2,\"items\":[" +
+                "{\"type\":\"app\",\"name\":\"Ori and the Blind Forest\",\"id\":261570,\"platforms\":{\"windows\":true}}," +
+                "{\"type\":\"app\",\"name\":\"Ori and the Blind Forest: Definitive Edition\",\"id\":387290,\"price\":{\"currency\":\"USD\",\"initial\":1999,\"final\":499},\"platforms\":{\"windows\":true}}]}";
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json(busqueda));
+            var r = new SteamScraper(cli).ConsultarAsync(J("Ori and the Blind Forest", "PC")).Result;
+            Verificar(r.Ok && r.PrecioActual == 4.99m && r.Enlace!.Contains("387290"),
+                      "Steam: si la primera coincidencia no tiene precio (retirada), usa la siguiente que sí se vende", Serializacion.AJson(r));
+            var (cli2, _, _) = Montar((r2, n) => ManejadorFalso.Json("{\"total\":1,\"items\":[{\"type\":\"app\",\"name\":\"Halo Infinite\",\"id\":1240440,\"platforms\":{\"windows\":true}}]}"));
+            var r3 = new SteamScraper(cli2).ConsultarAsync(J("Halo Infinite", "PC")).Result;
+            Verificar(!r3.Ok && r3.Error == TipoError.NoEncontrado && r3.Detalle!.Contains("sin precio"), "Steam: juego gratis (sin precio) -> no_encontrado con el motivo");
+        }
+        Verificar(NormalizadorNombres.Coincide("Cities: Skylines", "Cities: Skylines - Nintendo Switch Edition")
+                  && NormalizadorNombres.Coincide("Hades", "Hades Nintendo Switch")
+                  && !NormalizadorNombres.Coincide("Nintendo Switch Sports", "Sports"),
+                  "Nombres: se quita la etiqueta de consola de Nintendo al final del título");
+
+        {
+            // Ritmo adaptativo: 429 -> la pausa del dominio sube (2 s, luego 4 s) para todos los hilos.
+            var espia = new LimitadorEspia();
+            var mf = new ManejadorFalso((r, n) => r.RequestUri!.AbsolutePath == "/robots.txt"
+                ? ManejadorFalso.Texto(HttpStatusCode.OK, Fixtures.RobotsAbierto)
+                : (n <= 3 ? ManejadorFalso.Texto((HttpStatusCode)429, "lento") : ManejadorFalso.Json("{\"ok\":1}")));
+            var cfg = CfgRapida with { EsperaMaxima = TimeSpan.FromMilliseconds(20) };
+            var cli = new ClienteHttp(new HttpClient(mf), cfg, espia, new LogFallosArchivo(null));
+            var resp = cli.ObtenerAsync("https://www.eneba.com/x", new ContextoLog("J", "PC", "Eneba"), default).Result;
+            Verificar(resp.Codigo == 200 && espia.Pausas.Count >= 2 && espia.Pausas[0] == TimeSpan.FromSeconds(2) && espia.Pausas[1] == TimeSpan.FromSeconds(4)
+                      && espia.Pausas.All(p => p <= TimeSpan.FromSeconds(10)),
+                      "HTTP 429: baja el ritmo de ESE sitio (pausa 2 s, 4 s… máx. 10 s) y luego sigue", string.Join(",", espia.Pausas));
+        }
+
         Console.WriteLine("== Epic Games Store vía CheapShark ==");
         {
             var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.CheapSharkDeals(
@@ -660,4 +693,13 @@ public static class AutoTests
         public Task<ResultadoTienda> ConsultarAsync(Juego juego, CancellationToken ct = default) =>
             throw new InvalidOperationException("error de programación simulado");
     }
+}
+
+/// <summary>Limitador de prueba: no espera y registra las pausas mínimas que pide el cliente.</summary>
+internal sealed class LimitadorEspia : ILimitadorSolicitudes
+{
+    public readonly List<TimeSpan> Pausas = new();
+    public Task<IDisposable> EntrarAsync(string dominio, CancellationToken ct = default) => Task.FromResult<IDisposable>(new Nada());
+    public void ExigirPausaMinima(string dominio, TimeSpan pausa) { lock (Pausas) Pausas.Add(pausa); }
+    private sealed class Nada : IDisposable { public void Dispose() { } }
 }
