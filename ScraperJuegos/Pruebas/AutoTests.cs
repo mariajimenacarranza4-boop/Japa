@@ -337,6 +337,15 @@ public static class AutoTests
 
         Console.WriteLine("== Nintendo eShop ==");
         {
+            JsonElement H(string json) { using var d = JsonDocument.Parse(json); return d.RootElement.Clone(); }
+            Verificar(NintendoScraper.Imagen(H("{\"productImage\":\"ncom/software/switch/70010000027619/abc123\"}"))
+                          == "https://assets.nintendo.com/image/upload/f_auto,q_auto,w_920/ncom/software/switch/70010000027619/abc123"
+                      && NintendoScraper.Imagen(H("{\"productImage\":\"/content/dam/noa/x.png\"}")) == "https://www.nintendo.com/content/dam/noa/x.png"
+                      && NintendoScraper.Imagen(H("{\"horizontalHeaderImage\":\"https://img/h.jpg\",\"productImage\":\"x\"}")) == "https://img/h.jpg"
+                      && NintendoScraper.Imagen(H("{}")) == null,
+                      "Nintendo: imagen como id del servidor de imágenes, ruta del sitio o URL completa (prefiere la horizontal)");
+        }
+        {
             var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.NintendoRespuesta("Hades", "Nintendo Switch", "59.99", "39.99")));
             var r = new NintendoScraper(cli).ConsultarAsync(J("Hades", "Switch")).Result;
             Verificar(r.Ok && r.PrecioActual == 39.99m && r.PrecioRegular == 59.99m && r.Plataforma == "Switch" && r.Formato == "digital"

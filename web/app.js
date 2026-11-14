@@ -47,6 +47,21 @@ function evaluarOferta(actual, regular, sugerido) {
   return { en: false, pct: 0, ref: null };
 }
 
+/* Imágenes candidatas, de la mejor a la peor para una tarjeta horizontal:
+ * Steam (cabecera horizontal) → Nintendo → imagen del REPO u otras → Eneba (portada cuadrada) → Epic/CheapShark (miniatura chica).
+ * Si una no carga, la página prueba la siguiente; si ninguna carga, pone las iniciales del juego. */
+function rangoImagen(u) {
+  if (/steamstatic|steampowered/i.test(u)) return 0;
+  if (/nintendo/i.test(u)) return 1;
+  if (/eneba/i.test(u)) return 3;
+  if (/cheapshark|epicgames/i.test(u)) return 4;
+  return 2;
+}
+function imagenesOrdenadas(j, tiendas) {
+  const todas = [j.imagen_url, ...tiendas.map((t) => t.imagen_url)].map(urlSegura).filter(Boolean);
+  return [...new Set(todas)].sort((a, b) => rangoImagen(a) - rangoImagen(b));
+}
+
 /* Normaliza un registro del Contrato 2 sin fallar si faltan campos. */
 function normalizar(j) {
   const tiendas = (Array.isArray(j.tiendas) ? j.tiendas : [])
@@ -58,6 +73,7 @@ function normalizar(j) {
   const meta = j.metacritic && num(j.metacritic.score) !== null ? { score: num(j.metacritic.score), plataforma: j.metacritic.plataforma || null } : null;
   return {
     ...j,
+    _imagenes: imagenesOrdenadas(j, tiendas),
     plataformas: Array.isArray(j.plataformas) ? j.plataformas : (j.plataformas ? [j.plataformas] : []),
     tiendas, tipo, meta,
     hltb: num(j.hltb_horas),
@@ -160,13 +176,23 @@ function aplicar() {
 
 /* ---------- tarjetas ---------- */
 function imagenHtml(j, clase) {
-  const u = urlSegura(j.imagen_url);
+  const lista = j._imagenes || [];
+  const u = lista[0];
   const ini = esc((j.nombre || "?").split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase());
   const n = [...(j.nombre || "")].reduce((a, c) => (a + c.charCodeAt(0)) % 4, 0); // elige 1 de 4 degradados (styles.css: .ph.c0 … .ph.c3)
   const ph = `<div class="${clase} ph c${n}"><span>${ini}</span></div>`;
   if (!u) return ph;
-  return `<img class="${clase}" src="${esc(u)}" alt="" loading="lazy" decoding="async" data-ph="${esc(ph)}" onerror="this.outerHTML=this.dataset.ph">`;
+  return `<img class="${clase}" src="${esc(u)}" alt="" loading="lazy" decoding="async" data-ph="${esc(ph)}" data-alt="${esc(JSON.stringify(lista.slice(1)))}" onerror="siguienteImagen(this)">`;
 }
+
+/* Si una imagen no carga, prueba la siguiente candidata; al final, las iniciales. */
+function siguienteImagen(img) {
+  let resto = [];
+  try { resto = JSON.parse(img.dataset.alt || "[]"); } catch { resto = []; }
+  if (resto.length) { img.dataset.alt = JSON.stringify(resto.slice(1)); img.src = resto[0]; }
+  else img.outerHTML = img.dataset.ph;
+}
+window.siguienteImagen = siguienteImagen;
 
 function metaHtml(meta) {
   if (!meta) return `<span class="mc nd" title="Sin dato de Metacritic">${ND}</span>`;

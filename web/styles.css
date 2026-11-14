@@ -95,7 +95,7 @@ small { color: var(--color-texto-suave); }
   display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between;
   padding: 20px var(--margen-lados) 8px;
 }
-.marca { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; }
+.marca { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: center; }   /* frase centrada (en vertical) con el logo */
 /* logo JAPA: degradado de la paleta + brillo */
 .logo {
   margin: 0; font-family: var(--fuente-logo); font-weight: normal;
