@@ -1,0 +1,8 @@
+modo,trabajadores,tiempo_s,speedup,eficiencia_pct
+Secuencial,1,156.36,1.000,100.0
+Solo nivel 1,12,86.74,1.803,15.0
+Niveles 1+2,12,83.64,1.869,15.6
+Niveles 1+2+3,1,133.41,1.172,117.2
+Niveles 1+2+3,2,94.11,1.662,83.1
+Niveles 1+2+3,4,81.40,1.921,48.0
+Niveles 1+2+3,12,75.29,2.077,17.3

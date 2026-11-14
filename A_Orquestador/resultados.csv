@@ -1,0 +1,13 @@
+modo,trabajadores,tiempo_s,speedup,eficiencia_pct
+Solo nivel 1,1,28.27,1.033,103.3
+Solo nivel 1,2,16.08,1.816,90.8
+Solo nivel 1,4,9.28,3.147,78.7
+Solo nivel 1,12,5.80,5.034,41.9
+Niveles 1+2,1,15.81,1.848,NA
+Niveles 1+2,2,8.51,3.432,NA
+Niveles 1+2,4,5.19,5.625,NA
+Niveles 1+2,12,3.70,7.884,NA
+Niveles 1+2+3,1,8.64,3.382,NA
+Niveles 1+2+3,2,4.64,6.297,NA
+Niveles 1+2+3,4,3.49,8.376,NA
+Niveles 1+2+3,12,3.32,8.805,NA

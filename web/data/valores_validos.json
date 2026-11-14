@@ -1,0 +1,26 @@
+{
+  "plataformas": [
+    "PS5",
+    "PS4",
+    "Xbox Series",
+    "Xbox One",
+    "PC",
+    "Switch"
+  ],
+  "formatos": [
+    "digital",
+    "fisico"
+  ],
+  "tiendas": [
+    "Steam",
+    "Epic Games Store",
+    "Nintendo eShop",
+    "Eneba"
+  ],
+  "tipos_de_juego": [
+    "digital",
+    "fisico",
+    "otro"
+  ],
+  "total_juegos": 249
+}

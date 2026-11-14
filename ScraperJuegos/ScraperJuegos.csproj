@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ScraperJuegos</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Copia el CSV junto al ejecutable para que el programa lo encuentre.
+         El REPO se lee en CADA ejecución: editar Data/juegos.csv (u otro archivo con la opción repo) no requiere recompilar el código. -->
+    <Content Include="Data/juegos.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
