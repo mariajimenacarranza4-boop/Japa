@@ -1,9 +1,0 @@
-bin/
-obj/
-salida/
-*.log
-.env
-*.key
-secrets*
-.vs/
-ps.html

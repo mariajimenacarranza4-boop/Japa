@@ -13,6 +13,10 @@ Reglas de protección (para que la página nunca quede con datos rotos o vacíos
      (casi seguro es una corrida fallida, no un REPO que se achicó).
   5. Si NINGÚN juego tiene precio, o los juegos con precio bajan a menos de la mitad que antes, se rechaza
      (por ejemplo, si los sitios bloquearon al servidor de GitHub: es mejor seguir mostrando el último dato bueno).
+Además, con --repo, se QUITAN los juegos que ya no están en el REPO (el orquestador de A conserva los registros viejos
+para no perder datos en corridas parciales; sin esto, un juego borrado del CSV seguiría apareciendo para siempre).
+Con --podar-origen también se limpia el archivo de trabajo de A (datos/catalogo_a.json).
+
 Si algo falla, NO se toca catalogo.json (el sitio sigue mostrando el último dato bueno),
 se registra la corrida como "rechazada" y el script sale con código 1 para que el
 workflow quede en rojo y se note.
@@ -22,6 +26,7 @@ Uso:
       --modo real --evento schedule --run-id 123 --run-url https://...
 """
 import argparse
+import csv
 import json
 import os
 import sys
@@ -39,6 +44,12 @@ def cargar_registros(ruta):
     if not isinstance(datos, list):
         raise ValueError("el catálogo no es una lista de juegos (ni un objeto con 'juegos')")
     return datos
+
+
+def nombres_del_repo(ruta_csv):
+    """Nombres de juego del REPO (minúsculas, sin espacios extra)."""
+    with open(ruta_csv, encoding="utf-8-sig", newline="") as f:
+        return {(r.get("nombre") or "").strip().lower() for r in csv.DictReader(f, delimiter=";") if r.get("nombre")}
 
 
 def con_precio(registros):
@@ -81,6 +92,8 @@ def main():
     ap.add_argument("--run-id", default="")
     ap.add_argument("--run-url", default="")
     ap.add_argument("--duracion-seg", type=float, default=None)
+    ap.add_argument("--repo", default=None, help="CSV del REPO: se quitan los juegos que ya no están en él")
+    ap.add_argument("--podar-origen", action="store_true", help="también reescribe --nuevo sin esos juegos")
     a = ap.parse_args()
 
     ruta_cat = os.path.join(a.destino, "catalogo.json")
@@ -105,6 +118,17 @@ def main():
     registros, errores = [], []
     try:
         registros = cargar_registros(a.nuevo)
+        if a.repo:
+            en_repo = nombres_del_repo(a.repo)
+            quitados = [r.get("nombre") for r in registros if isinstance(r, dict) and (r.get("nombre") or "").strip().lower() not in en_repo]
+            if quitados:
+                registros = [r for r in registros if isinstance(r, dict) and (r.get("nombre") or "").strip().lower() in en_repo]
+                print(f"Se quitan {len(quitados)} juegos que ya no están en el REPO: {', '.join(map(str, quitados[:20]))}")
+                if a.podar_origen:
+                    tmp = a.nuevo + ".tmp"
+                    with open(tmp, "w", encoding="utf-8") as f:
+                        json.dump(registros, f, ensure_ascii=False, indent=2)
+                    os.replace(tmp, a.nuevo)
         errores = validar(registros, a.min_juegos, previos, previos_cp)
     except FileNotFoundError:
         errores = [f"no existe {a.nuevo} (¿el comando de scraping no generó el archivo?)"]

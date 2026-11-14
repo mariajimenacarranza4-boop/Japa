@@ -195,7 +195,7 @@ Adjuntar `salida/diagnostico/informe.txt` de la corrida de `diagnostico` como ev
 
 ### 3.6 Limitaciones conocidas (para la defensa)
 - **Formato físico:** las tiendas implementadas solo venden digital; el filtro "físico" queda vacío. Amazon y similares bloquean el scraping y el reparto indica no pelear con bloqueos. Decisión del equipo: ____.
-- **Cobertura de tiendas:** PC tiene Steam, Epic Games Store (vía CheapShark, porque la tienda directa responde 403) y Eneba; Switch tiene Nintendo eShop y Eneba; PS4, PS5 y Xbox solo tienen Eneba (PlayStation Store se eliminó). Con el REPO actual, 184 de 249 juegos tenían precio en 2 tiendas distintas antes de agregar Epic (volver a contar con `dotnet run`). Si Eneba bloquea, PS y Xbox quedan sin precio.
+- **Cobertura de tiendas:** PC tiene Steam, Epic Games Store (vía CheapShark, porque la tienda directa responde 403) y Eneba; Switch tiene Nintendo eShop y Eneba; PS4, PS5 y Xbox solo tienen Eneba (PlayStation Store se eliminó). **En las pruebas reales, Eneba no devolvió claves de PlayStation para ningún juego (solo PC y Xbox)**: las versiones de PS4/PS5 quedan sin precio; los juegos multiplataforma tienen precio por sus otras plataformas y solo 6 exclusivos de PlayStation (Bloodborne, Gran Turismo 7, Astro Bot, Demon's Souls, Death Stranding 2, Ghost of Yōtei) quedan sin ninguna tienda. Se evaluó la API de PlatPrices (requiere clave) y el equipo decidió no depender de un servicio con clave. Con el REPO actual, 184 de 249 juegos tenían precio en 2 tiendas distintas antes de agregar Epic (volver a contar con `dotnet run`). Si Eneba bloquea, PS y Xbox quedan sin precio.
 - **REPO local:** vive en `Data/juegos.csv` (cumple "dinámico"); `exportar` genera el JSON para cargarlo a la nube si el equipo lo decide.
 
 ### 3.6b HowLongToBeat: por qué `/game/ID` y de dónde salen las horas y fechas
@@ -479,7 +479,7 @@ fecha de consulta de cada precio; precio sugerido, Metacritic (con su plataforma
 | Filtro | Criterio |
 |---|---|
 | Tipo de juego | `digital` si **todas** sus ofertas son digitales, `físico` si todas son físicas, `otro` si mezcla formatos o no hay dato |
-| Plataforma | el juego está en esa plataforma (según el REPO) |
+| Plataforma | el juego está en esa plataforma (según el REPO). Solo se ofrecen las plataformas con al menos un precio: hoy PS4 y PS5 no aparecen porque ninguna tienda implementada les da precio (ver 3.6) |
 | Formato | el juego tiene al menos una oferta en ese formato |
 | Tienda | el juego tiene precio en esa tienda |
 | Mostrar: *Todos los juegos* / *Solo ofertas* | con "Solo ofertas" quedan solo los juegos cuyo mejor precio visible está en oferta |

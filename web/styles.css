@@ -166,8 +166,10 @@ input:focus-visible, select:focus-visible, button:focus-visible, .card:focus-vis
   transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
 }
 .card:hover { transform: translateY(var(--subida-hover)); border-color: var(--color-principal); box-shadow: var(--sombra-hover); }
-.img-wrap { position: relative; aspect-ratio: var(--proporcion-imagen); background: var(--color-campo); }
-.img, .ph { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* La imagen SIEMPRE ocupa el mismo alto: las portadas verticales (como las de Eneba) se recortan en vez de estirar la tarjeta. */
+.img-wrap { position: relative; aspect-ratio: var(--proporcion-imagen); background: var(--color-campo); overflow: hidden; }
+.img-wrap > .img, .img-wrap > .ph { position: absolute; inset: 0; }
+.img, .ph { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
 /* imagen de reemplazo (iniciales) cuando el juego no tiene imagen */
 .ph { display: grid; place-items: center; }
 .ph.c0 { background: linear-gradient(135deg, var(--coral), var(--morado)); }
@@ -176,7 +178,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .card:focus-vis
 .ph.c3 { background: linear-gradient(135deg, var(--azul), var(--malva)); }
 .ph span { font-size: 34px; font-weight: 800; letter-spacing: .04em; color: var(--durazno); text-shadow: 0 2px 8px rgba(0, 0, 0, .3); }
 /* cinta "OFERTA" sobre la imagen */
-.flag {
+.flag { z-index: 1;
   position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 800; letter-spacing: .06em;
   background: linear-gradient(90deg, var(--color-principal), var(--color-secundario)); color: var(--color-texto-oscuro);
   padding: 3px 8px; border-radius: 6px;

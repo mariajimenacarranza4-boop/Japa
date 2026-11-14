@@ -45,6 +45,7 @@ public sealed class SteamScraper : ITiendaScraper
         if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
             throw new ScraperException(TipoError.FormatoCambiado, "la búsqueda de Steam no trae el arreglo 'items'");
 
+        string? sinPrecio = null;   // coincidencia que existe pero no se vende: se sigue buscando otra (ej. versión vieja retirada)
         foreach (var item in items.EnumerateArray())
         {
             string? nombre = Texto(item, "name");
@@ -57,11 +58,16 @@ public sealed class SteamScraper : ITiendaScraper
                 throw new ScraperException(TipoError.FormatoCambiado, "un resultado de Steam no trae 'id'");
 
             if (!item.TryGetProperty("price", out var precio) || precio.ValueKind != JsonValueKind.Object)
-                throw new ScraperException(TipoError.NoEncontrado,
-                    $"'{nombre}' existe en Steam pero sin precio (no comprable / no disponible en US)");
+            {
+                sinPrecio ??= nombre;
+                continue;
+            }
 
             return Construir(id, Entero(precio, "initial"), Entero(precio, "final"), null);
         }
+        if (sinPrecio != null)
+            throw new ScraperException(TipoError.NoEncontrado,
+                $"'{sinPrecio}' existe en Steam pero sin precio (gratis, retirado de la venta o no disponible en US)");
         throw new ScraperException(TipoError.NoEncontrado,
             $"ningún resultado de Steam coincide con '{juego.NombreParaBuscar}' (se evaluaron {items.GetArrayLength()})");
     }

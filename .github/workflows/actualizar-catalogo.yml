@@ -82,6 +82,8 @@ jobs:
           echo "NUEVO=datos/catalogo_a.json" >> "$GITHUB_ENV"
           # Logs de A y B como evidencia (se suben como artefacto más abajo).
           cp A_Orquestador/log_fallos.txt "$SALIDA/" 2>/dev/null || true
+          # Resumen corto de fallos por fuente (queda en el repo para revisar por qué falló una tienda).
+          python3 scripts/resumir_fallos.py A_Orquestador/log_fallos.txt web/data/fallos_ultima_corrida.txt || true
 
       - name: Datos de ejemplo (mock, solo si MODO_CATALOGO = mock)
         if: steps.modo.outputs.modo != 'real'
@@ -96,6 +98,7 @@ jobs:
         run: |
           python3 scripts/publicar_catalogo.py \
             --nuevo "$NUEVO" --destino web/data \
+            --repo ScraperJuegos/Data/juegos.csv --podar-origen \
             --min-juegos "${{ vars.MIN_JUEGOS || 1 }}" \
             --modo "${{ steps.modo.outputs.modo }}" \
             --evento "${{ github.event_name }}" \
