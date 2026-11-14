@@ -100,7 +100,7 @@
 121;Forza Motorsport;PC;2023-10-10;69.99;;;;;
 124;Gears 5;Xbox One;2019-09-10;59.99;;;;;
 125;Gears 5;PC;2019-09-10;59.99;;;;;
-126;Microsoft Flight Simulator;PC;2020-08-18;59.99;;;Microsoft Flight Simulator 40th Anniversary Edition;microsoft-flight-simulator;
+126;Microsoft Flight Simulator;PC;2020-08-18;59.99;;1250410;Microsoft Flight Simulator 40th Anniversary Edition;microsoft-flight-simulator;
 127;Microsoft Flight Simulator;Xbox Series;2020-08-18;59.99;;;;;
 128;Diablo IV;PS5;2023-06-06;69.99;;;;;
 129;Diablo IV;Xbox Series;2023-06-06;69.99;;;;;
@@ -178,7 +178,7 @@
 205;Cult of the Lamb;Switch;2022-08-11;24.99;;;;;
 206;Cult of the Lamb;PS5;2022-08-11;24.99;;;;;
 207;Cult of the Lamb;Xbox Series;2022-08-11;24.99;;;;;
-208;Disco Elysium;PC;2019-10-15;39.99;;;Disco Elysium - The Final Cut;disco-elysium;
+208;Disco Elysium;PC;2019-10-15;39.99;;632470;Disco Elysium - The Final Cut;disco-elysium;
 209;Disco Elysium;PS4;2019-10-15;39.99;;;;;
 210;Disco Elysium;Xbox One;2019-10-15;39.99;;;;;
 211;Disco Elysium;Switch;2019-10-15;39.99;;;Disco Elysium - The Final Cut;disco-elysium;
@@ -271,7 +271,7 @@
 298;Palworld;PC;2024-01-19;29.99;;;;;
 299;Palworld;Xbox Series;2024-01-19;29.99;;;;;
 300;Lethal Company;PC;2023-10-23;9.99;;;;;
-301;Sea of Stars;PC;2023-08-29;34.99;;;;;
+301;Sea of Stars;PC;2023-08-29;34.99;;1244090;;;
 302;Sea of Stars;PS5;2023-08-29;34.99;;;;;
 303;Sea of Stars;Switch;2023-08-29;34.99;;;;;
 304;Sea of Stars;Xbox Series;2023-08-29;34.99;;;;;
@@ -388,7 +388,7 @@
 419;Dark Souls II: Scholar of the First Sin;Xbox One;2015-04-07;39.99;;;;;
 420;Dark Souls II: Scholar of the First Sin;PC;2015-04-07;39.99;;;;;
 421;Nioh 2;PS4;2020-03-13;49.99;;;;;
-422;Nioh 2;PC;2020-03-13;49.99;;;Nioh 2 – The Complete Edition;nioh-2;
+422;Nioh 2;PC;2020-03-13;49.99;;1325200;Nioh 2 – The Complete Edition;nioh-2;
 423;Wo Long: Fallen Dynasty;PS5;2023-03-03;59.99;;;;;
 424;Wo Long: Fallen Dynasty;Xbox Series;2023-03-03;59.99;;;;;
 425;Wo Long: Fallen Dynasty;PC;2023-03-03;59.99;;;;;
@@ -453,7 +453,7 @@
 484;Assassin's Creed Origins;PS4;2017-10-27;59.99;;;;;
 485;Assassin's Creed Origins;Xbox One;2017-10-27;59.99;;;;;
 486;Sea of Thieves;Xbox One;2018-03-20;39.99;;;;;
-487;Sea of Thieves;PC;2018-03-20;39.99;;;;;
+487;Sea of Thieves;PC;2018-03-20;39.99;;1172620;;;
 488;Sea of Thieves;PS5;2018-03-20;39.99;;;;;
 489;Valheim;PC;2021-02-02;19.99;;;;;
 490;Valheim;Xbox Series;2021-02-02;19.99;;;;;
@@ -534,7 +534,7 @@
 565;Need for Speed Unbound;PC;2022-12-02;69.99;;;;;
 568;F1 24;PS5;2024-05-31;69.99;;;;;
 569;F1 24;Xbox Series;2024-05-31;69.99;;;;;
-570;F1 24;PC;2024-05-31;69.99;;;;;
+570;F1 24;PC;2024-05-31;69.99;;2488620;;;
 571;Sonic Mania;PC;2017-08-15;19.99;;;;;
 572;Sonic Mania;Switch;2017-08-15;19.99;;;;;
 573;Sonic Mania;PS4;2017-08-15;19.99;;;;;
@@ -560,8 +560,6 @@
 593;Final Fantasy XV;PS4;2016-11-29;19.99;;;;;
 594;Final Fantasy XV;Xbox One;2016-11-29;19.99;;;;;
 595;Final Fantasy XV;PC;2016-11-29;19.99;;;FINAL FANTASY XV WINDOWS EDITION;final-fantasy-xv;
-596;Kingdom Hearts III;PS4;2019-01-29;29.99;;;;;
-597;Kingdom Hearts III;Xbox One;2019-01-29;29.99;;;;;
 598;Ghostwire: Tokyo;PS5;2022-03-25;59.99;;;;;
 599;Ghostwire: Tokyo;PC;2022-03-25;59.99;;;;;
 600;Deathloop;PS5;2021-09-14;59.99;;;;;
@@ -627,7 +625,7 @@
 660;Neon White;Switch;2022-06-16;24.99;;;;;
 661;Inscryption;PC;2021-10-19;19.99;;;;;
 662;Dredge;PC;2023-03-30;24.99;;;;;
-663;Spiritfarer;PC;2020-08-18;29.99;;;;;
+663;Spiritfarer;PC;2020-08-18;29.99;;972660;;;
 664;Unpacking;PC;2021-11-02;19.99;;;;;
 665;Animal Well;PC;2024-05-09;24.99;;;;;
 666;Dead by Daylight;PC;2016-06-14;19.99;;;;;
@@ -639,4 +637,4 @@
 672;Pizza Tower;PC;2023-01-26;19.99;;;;;
 673;Slime Rancher;PC;2017-08-01;19.99;;;;;
 674;Papers, Please;PC;2013-08-08;9.99;;;;;
-675;Kingdom Hearts III;PC;2024-06-13;49.99;;;KINGDOM HEARTS III + Re Mind (DLC);kingdom-hearts-iii;
+675;PEAK;PC;2025-06-16;7.99;;3527290;;;
