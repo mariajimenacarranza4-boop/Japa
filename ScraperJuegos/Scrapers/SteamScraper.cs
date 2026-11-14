@@ -63,7 +63,10 @@ public sealed class SteamScraper : ITiendaScraper
                 continue;
             }
 
-            return Construir(id, Entero(precio, "initial"), Entero(precio, "final"), ImagenDeBusqueda(item));
+            string? imagen = ImagenDeBusqueda(item);
+            if (imagen != null && imagen.Contains("/store_item_assets/", StringComparison.OrdinalIgnoreCase))
+                imagen = await HeaderRealAsync(id, ctx, ct).ConfigureAwait(false) ?? Texto(item, "tiny_image");
+            return Construir(id, Entero(precio, "initial"), Entero(precio, "final"), imagen);
         }
         if (sinPrecio != null)
             throw new ScraperException(TipoError.NoEncontrado,
@@ -88,6 +91,25 @@ public sealed class SteamScraper : ITiendaScraper
         return barra > 0 ? sinQuery[..(barra + 1)] + "header.jpg" + (q >= 0 ? tiny[q..] : "") : tiny;
     }
 
+    /// <summary>
+    /// En los juegos nuevos cada imagen tiene su propio código en la ruta, así que no se puede "adivinar" header.jpg a partir
+    /// de la miniatura. Se pide la ruta real a appdetails (solo datos básicos). Si falla, se devuelve null y se usa la
+    /// miniatura (más chica, pero válida): la imagen nunca hace fallar el precio.
+    /// </summary>
+    private async Task<string?> HeaderRealAsync(string appId, ContextoLog ctx, CancellationToken ct)
+    {
+        try
+        {
+            string url = $"https://store.steampowered.com/api/appdetails?appids={Uri.EscapeDataString(appId)}&cc=us&l=english&filters=basic";
+            var resp = await _http.ObtenerAsync(url, ctx, ct).ConfigureAwait(false);
+            using var doc = JsonDocument.Parse(resp.Cuerpo);
+            return doc.RootElement.TryGetProperty(appId, out var nodo) && nodo.TryGetProperty("data", out var data)
+                ? Texto(data, "header_image") : null;
+        }
+        catch (OperationCanceledException) { throw; }
+        catch { return null; }
+    }
+
     // ---- Ruta 2: el REPO ya trae el appid ----
     private async Task<ResultadoTienda> PorAppIdAsync(Juego juego, string appId, ContextoLog ctx, CancellationToken ct)
     {
@@ -104,13 +126,25 @@ public sealed class SteamScraper : ITiendaScraper
 
         if (data.TryGetProperty("type", out var tipo) && tipo.GetString() is { } t && t != "game")
             throw new ScraperException(TipoError.NoEncontrado, $"el appid {appId} es de tipo '{t}', no 'game'");
-        if (!NormalizadorNombres.CoincideConJuego(juego, Texto(data, "name")))
+        if (!NormalizadorNombres.CoincideConJuego(juego, Texto(data, "name")) && !EsEdicionDe(juego, Texto(data, "name")))
             throw new ScraperException(TipoError.NoEncontrado,
                 $"el appid {appId} es '{Texto(data, "name")}', no '{juego.Nombre}' (revise steam_appid en el REPO)");
         if (!data.TryGetProperty("price_overview", out var po) || po.ValueKind != JsonValueKind.Object)
             throw new ScraperException(TipoError.NoEncontrado, "el juego no tiene precio en Steam (gratis, no lanzado o retirado)");
 
         return Construir(appId, Entero(po, "initial"), Entero(po, "final"), Texto(data, "header_image"));
+    }
+
+    /// <summary>
+    /// Solo para la ruta por appid (el REPO dice explícitamente qué juego es): se acepta que Steam le agregue al nombre una
+    /// edición o subtítulo, ej. "Disco Elysium - The Final Cut", "Spiritfarer®: Farewell Edition". El nombre de Steam debe
+    /// EMPEZAR con el nombre completo del REPO, así un appid equivocado (otro juego) igual se rechaza.
+    /// No se usa en la búsqueda por nombre, porque ahí "Doom" aceptaría "Doom Eternal".
+    /// </summary>
+    public static bool EsEdicionDe(Juego juego, string? nombreSteam)
+    {
+        string s = NormalizadorNombres.Normalizar(nombreSteam), n = NormalizadorNombres.Normalizar(juego.Nombre);
+        return n.Length > 0 && s.StartsWith(n + " ", StringComparison.Ordinal);
     }
 
     private ResultadoTienda Construir(string id, long? initialCent, long? finalCent, string? imagen)
