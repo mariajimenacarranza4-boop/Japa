@@ -300,6 +300,13 @@ public static class AutoTests
             var r3 = new SteamScraper(cli2).ConsultarAsync(J("Halo Infinite", "PC")).Result;
             Verificar(!r3.Ok && r3.Error == TipoError.NoEncontrado && r3.Detalle!.Contains("sin precio"), "Steam: juego gratis (sin precio) -> no_encontrado con el motivo");
         }
+        {
+            JsonElement H(string json) { using var d = JsonDocument.Parse(json); return d.RootElement.Clone(); }
+            Verificar(SteamScraper.ImagenDeBusqueda(H("{\"tiny_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2933620/abc123/capsule_231x87.jpg?t=17\"}"))
+                          == "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2933620/abc123/header.jpg?t=17"
+                      && SteamScraper.ImagenDeBusqueda(H("{}")) == null,
+                      "Steam: la imagen sale de la ruta real de la búsqueda (juegos nuevos con código en la ruta)");
+        }
         Verificar(NormalizadorNombres.Coincide("Cities: Skylines", "Cities: Skylines - Nintendo Switch Edition")
                   && NormalizadorNombres.Coincide("Hades", "Hades Nintendo Switch")
                   && !NormalizadorNombres.Coincide("Nintendo Switch Sports", "Sports"),

@@ -63,13 +63,29 @@ public sealed class SteamScraper : ITiendaScraper
                 continue;
             }
 
-            return Construir(id, Entero(precio, "initial"), Entero(precio, "final"), null);
+            return Construir(id, Entero(precio, "initial"), Entero(precio, "final"), ImagenDeBusqueda(item));
         }
         if (sinPrecio != null)
             throw new ScraperException(TipoError.NoEncontrado,
                 $"'{sinPrecio}' existe en Steam pero sin precio (gratis, retirado de la venta o no disponible en US)");
         throw new ScraperException(TipoError.NoEncontrado,
             $"ningún resultado de Steam coincide con '{juego.NombreParaBuscar}' (se evaluaron {items.GetArrayLength()})");
+    }
+
+    /// <summary>
+    /// Imagen desde el resultado de búsqueda. Steam cambió (≈2024) la ruta de las imágenes de los juegos nuevos: ahora llevan
+    /// un código en la carpeta (".../store_item_assets/steam/apps/ID/CODIGO/capsule_231x87.jpg"), así que
+    /// "/steam/apps/ID/header.jpg" da 404 en esos juegos (ej. los Call of Duty recientes). La búsqueda trae la ruta correcta
+    /// en "tiny_image" (cápsula chica): se usa la misma carpeta con "header.jpg" (la imagen horizontal grande).
+    /// </summary>
+    public static string? ImagenDeBusqueda(JsonElement item)
+    {
+        string? tiny = Texto(item, "tiny_image");
+        if (string.IsNullOrWhiteSpace(tiny) || !tiny.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) return null;
+        int q = tiny.IndexOf('?');
+        string sinQuery = q >= 0 ? tiny[..q] : tiny;
+        int barra = sinQuery.LastIndexOf('/');
+        return barra > 0 ? sinQuery[..(barra + 1)] + "header.jpg" + (q >= 0 ? tiny[q..] : "") : tiny;
     }
 
     // ---- Ruta 2: el REPO ya trae el appid ----
