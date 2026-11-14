@@ -1,0 +1,43 @@
+# Publica la carpeta web/ en GitHub Pages.
+# Se ejecuta: al hacer push a main que toque web/, a mano, o llamado por "Actualizar catálogo".
+name: Desplegar sitio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - ".github/workflows/desplegar-sitio.yml"
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # github.ref (rama) y no github.sha: así incluye el commit de datos que acaba de hacer "Actualizar catálogo".
+          ref: ${{ github.ref }}
+
+      - name: Comprobar que el catálogo es JSON válido
+        run: python3 -c "import json; d=json.load(open('web/data/catalogo.json', encoding='utf-8')); print('juegos:', len(d['juegos'] if isinstance(d, dict) else d))"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: deploy
+        uses: actions/deploy-pages@v4
