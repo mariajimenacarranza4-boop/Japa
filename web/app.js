@@ -132,14 +132,16 @@ function construirOpciones() {
   // si algún día hay precios de esas consolas, vuelven a aparecer solas).
   const platsConPrecio = new Set(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.plataforma).filter(Boolean)));
   const plats = union(v.plataformas, estado.juegos.flatMap((j) => j.plataformas)).filter((p) => platsConPrecio.has(p));
-  const tiendas = union(v.tiendas, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda)));
+  // Tienda: solo las que tienen al menos un precio (ej. Epic, apagada, no aparece).
+  const tiendasConPrecio = new Set(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda)));
+  const tiendas = union(v.tiendas, [...tiendasConPrecio]).filter((t) => tiendasConPrecio.has(t));
   const formatos = union(v.formatos, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato).filter(Boolean)));
   const tipos = union(v.tipos_de_juego || ["digital", "fisico", "otro"], []);
   const hay = (lista) => new Set(lista);
   llenarSelect("fTipo", tipos, (x) => ETIQUETA_FORMATO[x] || x, hay(estado.juegos.map((j) => j.tipo)));
   llenarSelect("fPlataforma", plats);
   llenarSelect("fFormato", formatos, (x) => ETIQUETA_FORMATO[x] || x, hay(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato))));
-  llenarSelect("fTienda", tiendas, undefined, hay(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda))));
+  llenarSelect("fTienda", tiendas);
 }
 
 function aplicar() {
