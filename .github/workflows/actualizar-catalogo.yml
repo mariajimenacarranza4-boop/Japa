@@ -59,8 +59,9 @@ jobs:
           # así que se exportan más abajo únicamente cuando traen valor.
           SECRETO_CONTACTO: ${{ secrets.SCRAPER_CONTACTO }}
           SECRETO_NINTENDO: ${{ secrets.NINTENDO_ALGOLIA_KEY }}
-          # Tiendas a apagar sin recompilar (ej. "Epic Games Store" si CheapShark fallara). Por defecto ninguna.
-          TIENDAS_DESACTIVADAS: ${{ vars.TIENDAS_DESACTIVADAS || '' }}
+          # Tiendas apagadas: Epic, porque store.epicgames.com responde 403 y el robots.txt de CheapShark prohíbe /api/1.0/
+          # (verificado en la corrida del 14-nov-2026). Se cambia con la variable TIENDAS_DESACTIVADAS sin tocar código.
+          TIENDAS_DESACTIVADAS: ${{ vars.TIENDAS_DESACTIVADAS || 'Epic Games Store' }}
           SALIDA: ${{ runner.temp }}/salida
           # Comando de A (se corre DESDE la carpeta A_Orquestador; en Linux las rutas usan /).
           # datos/catalogo_a.json queda guardado en el repo: A lo lee en la corrida siguiente para conservar
