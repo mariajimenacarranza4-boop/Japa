@@ -128,13 +128,16 @@ function llenarSelect(id, valores, etiqueta = (v) => v, conDatos = null) {
 function construirOpciones() {
   const v = estado.valores || {};
   const union = (base, extra) => [...new Set([...(base || []), ...extra])];
-  const plats = union(v.plataformas, estado.juegos.flatMap((j) => j.plataformas));
+  // Plataforma: SOLO las que tienen al menos un precio (hoy PS4/PS5 no tienen tienda con precio, así que no aparecen;
+  // si algún día hay precios de esas consolas, vuelven a aparecer solas).
+  const platsConPrecio = new Set(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.plataforma).filter(Boolean)));
+  const plats = union(v.plataformas, estado.juegos.flatMap((j) => j.plataformas)).filter((p) => platsConPrecio.has(p));
   const tiendas = union(v.tiendas, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda)));
   const formatos = union(v.formatos, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato).filter(Boolean)));
   const tipos = union(v.tipos_de_juego || ["digital", "fisico", "otro"], []);
   const hay = (lista) => new Set(lista);
   llenarSelect("fTipo", tipos, (x) => ETIQUETA_FORMATO[x] || x, hay(estado.juegos.map((j) => j.tipo)));
-  llenarSelect("fPlataforma", plats, undefined, hay(estado.juegos.flatMap((j) => j.plataformas)));
+  llenarSelect("fPlataforma", plats);
   llenarSelect("fFormato", formatos, (x) => ETIQUETA_FORMATO[x] || x, hay(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato))));
   llenarSelect("fTienda", tiendas, undefined, hay(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda))));
 }
@@ -182,7 +185,7 @@ function imagenHtml(j, clase) {
   const n = [...(j.nombre || "")].reduce((a, c) => (a + c.charCodeAt(0)) % 4, 0); // elige 1 de 4 degradados (styles.css: .ph.c0 … .ph.c3)
   const ph = `<div class="${clase} ph c${n}"><span>${ini}</span></div>`;
   if (!u) return ph;
-  return `<img class="${clase}" src="${esc(u)}" alt="" loading="lazy" decoding="async" data-ph="${esc(ph)}" data-alt="${esc(JSON.stringify(lista.slice(1)))}" onerror="siguienteImagen(this)">`;
+  return `<img class="${clase}" src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-ph="${esc(ph)}" data-alt="${esc(JSON.stringify(lista.slice(1)))}" onerror="siguienteImagen(this)">`;
 }
 
 /* Si una imagen no carga, prueba la siguiente candidata; al final, las iniciales. */
@@ -200,14 +203,15 @@ function metaHtml(meta) {
   return `<span class="mc ${c}" title="Metacritic${meta.plataforma ? " (" + esc(meta.plataforma) + ")" : ""}">${meta.score}</span>`;
 }
 
-function tarjeta({ j, mejor }) {
+function tarjeta({ j, mejor }, f = leerFiltros()) {
   const precio = mejor
     ? `<div class="precio">
          <span class="actual">${dinero(mejor.t.precio_actual)}</span>
          ${mejor.o.en ? `<s class="regular">${dinero(mejor.o.ref)}</s><span class="badge">−${Math.round(mejor.o.pct)}%</span>` : ""}
        </div>
        <div class="donde">en ${esc(mejor.t.tienda)}</div>`
-    : `<div class="precio"><span class="actual nd">Sin precio</span></div><div class="donde">${ND}</div>`;
+    : `<div class="precio"><span class="actual nd">Sin precio${f.plataforma ? " para " + esc(f.plataforma) : ""}</span></div>` +
+      `<div class="donde">${f.plataforma && j.tiendas.length ? "hay precio en otras plataformas" : ND}</div>`;
   return `<article class="card" tabindex="0" role="button" data-id="${esc(j.id)}" aria-label="Ver detalle de ${esc(j.nombre)}">
     <div class="img-wrap">${imagenHtml(j, "img")}${mejor && mejor.o.en ? `<span class="flag">OFERTA</span>` : ""}</div>
     <div class="info">
@@ -218,12 +222,12 @@ function tarjeta({ j, mejor }) {
   </article>`;
 }
 
-function pintar(lista) {
+function pintar(lista, f = leerFiltros()) {
   $("conteo").textContent = mostrarSoloOfertas()
     ? `${lista.length} juegos en oferta (de ${estado.juegos.length})`
     : `${lista.length} de ${estado.juegos.length} juegos`;
   $("grid").innerHTML = lista.length
-    ? lista.map(tarjeta).join("")
+    ? lista.map((x) => tarjeta(x, f)).join("")
     : `<p class="vacio">Ningún juego cumple esos filtros. <button class="btn-sec" type="button" onclick="limpiar()">Limpiar filtros</button></p>`;
 }
 
