@@ -68,7 +68,6 @@
 67;Sekiro: Shadows Die Twice;PS4;2019-03-22;59.99;;;;;
 68;Sekiro: Shadows Die Twice;Xbox One;2019-03-22;59.99;;;;;
 69;Sekiro: Shadows Die Twice;PC;2019-03-22;59.99;;;;;
-70;Bloodborne;PS4;2015-03-24;19.99;;;;;
 71;Death Stranding;PS4;2019-11-08;39.99;;;;;
 72;Death Stranding;PC;2019-11-08;39.99;;;;;
 73;Control;PS4;2019-08-27;29.99;;;;;
@@ -116,8 +115,6 @@
 115;Forza Horizon 5;Xbox Series;2021-11-09;59.99;;;;;
 116;Forza Horizon 5;PC;2021-11-09;59.99;;;;;
 117;Forza Horizon 5;PS5;2021-11-09;59.99;;;;;
-118;Gran Turismo 7;PS5;2022-03-04;69.99;;;;;
-119;Gran Turismo 7;PS4;2022-03-04;69.99;;;;;
 120;Forza Motorsport;Xbox Series;2023-10-10;69.99;;;;;
 121;Forza Motorsport;PC;2023-10-10;69.99;;;;;
 122;Halo Infinite;Xbox Series;2021-12-08;59.99;;;;;
@@ -311,12 +308,10 @@
 310;Black Myth: Wukong;PS5;2024-08-20;59.99;;;;;
 311;Stellar Blade;PS5;2024-04-26;69.99;;;;;
 312;Stellar Blade;PC;2024-04-26;69.99;;;;;
-313;Astro Bot;PS5;2024-09-06;59.99;;;;;
 314;Returnal;PS5;2021-04-30;69.99;;;;;
 315;Returnal;PC;2021-04-30;69.99;;;;;
 316;Ratchet & Clank: Rift Apart;PS5;2021-06-11;69.99;;;;;
 317;Ratchet & Clank: Rift Apart;PC;2021-06-11;69.99;;;;;
-318;Demon's Souls;PS5;2020-11-12;69.99;;;;;
 319;The Legend of Zelda: Breath of the Wild;Switch;2017-03-03;59.99;;;;;
 320;The Legend of Zelda: Tears of the Kingdom;Switch;2023-05-12;69.99;;;;;
 321;Super Mario Odyssey;Switch;2017-10-27;59.99;;;;;
@@ -410,8 +405,6 @@
 409;Marvel's Spider-Man: Miles Morales;PC;2020-11-12;49.99;;;;;
 410;Marvel's Spider-Man;PS4;2018-09-07;39.99;;;;;
 411;Marvel's Spider-Man;PC;2018-09-07;39.99;;;;;
-412;Death Stranding 2: On the Beach;PS5;2025-06-26;69.99;;;;;
-413;Ghost of Yōtei;PS5;2025-10-02;69.99;;;;;
 414;Dark Souls: Remastered;PS4;2018-05-25;39.99;;;;;
 415;Dark Souls: Remastered;Xbox One;2018-05-25;39.99;;;;;
 416;Dark Souls: Remastered;PC;2018-05-25;39.99;;;;;
@@ -659,3 +652,9 @@
 658;Pentiment;Xbox Series;2022-11-15;19.99;;;;;
 659;Neon White;PC;2022-06-16;24.99;;;;;
 660;Neon White;Switch;2022-06-16;24.99;;;;;
+661;Inscryption;PC;2021-10-19;19.99;;;;;
+662;Dredge;PC;2023-03-30;24.99;;;;;
+663;Spiritfarer;PC;2020-08-18;29.99;;;;;
+664;Unpacking;PC;2021-11-02;19.99;;;;;
+665;Animal Well;PC;2024-05-09;24.99;;;;;
+666;Dead by Daylight;PC;2016-06-14;19.99;;;;;
