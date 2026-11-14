@@ -98,6 +98,7 @@ jobs:
         run: |
           python3 scripts/publicar_catalogo.py \
             --nuevo "$NUEVO" --destino web/data \
+            --repo ScraperJuegos/Data/juegos.csv --podar-origen \
             --min-juegos "${{ vars.MIN_JUEGOS || 1 }}" \
             --modo "${{ steps.modo.outputs.modo }}" \
             --evento "${{ github.event_name }}" \

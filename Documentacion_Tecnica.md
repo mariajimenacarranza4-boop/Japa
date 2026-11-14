@@ -479,7 +479,7 @@ fecha de consulta de cada precio; precio sugerido, Metacritic (con su plataforma
 | Filtro | Criterio |
 |---|---|
 | Tipo de juego | `digital` si **todas** sus ofertas son digitales, `físico` si todas son físicas, `otro` si mezcla formatos o no hay dato |
-| Plataforma | el juego está en esa plataforma (según el REPO) |
+| Plataforma | el juego está en esa plataforma (según el REPO). Solo se ofrecen las plataformas con al menos un precio: hoy PS4 y PS5 no aparecen porque ninguna tienda implementada les da precio (ver 3.6) |
 | Formato | el juego tiene al menos una oferta en ese formato |
 | Tienda | el juego tiene precio en esa tienda |
 | Mostrar: *Todos los juegos* / *Solo ofertas* | con "Solo ofertas" quedan solo los juegos cuyo mejor precio visible está en oferta |

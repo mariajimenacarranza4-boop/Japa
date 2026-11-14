@@ -128,13 +128,16 @@ function llenarSelect(id, valores, etiqueta = (v) => v, conDatos = null) {
 function construirOpciones() {
   const v = estado.valores || {};
   const union = (base, extra) => [...new Set([...(base || []), ...extra])];
-  const plats = union(v.plataformas, estado.juegos.flatMap((j) => j.plataformas));
+  // Plataforma: SOLO las que tienen al menos un precio (hoy PS4/PS5 no tienen tienda con precio, así que no aparecen;
+  // si algún día hay precios de esas consolas, vuelven a aparecer solas).
+  const platsConPrecio = new Set(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.plataforma).filter(Boolean)));
+  const plats = union(v.plataformas, estado.juegos.flatMap((j) => j.plataformas)).filter((p) => platsConPrecio.has(p));
   const tiendas = union(v.tiendas, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda)));
   const formatos = union(v.formatos, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato).filter(Boolean)));
   const tipos = union(v.tipos_de_juego || ["digital", "fisico", "otro"], []);
   const hay = (lista) => new Set(lista);
   llenarSelect("fTipo", tipos, (x) => ETIQUETA_FORMATO[x] || x, hay(estado.juegos.map((j) => j.tipo)));
-  llenarSelect("fPlataforma", plats, undefined, hay(estado.juegos.flatMap((j) => j.plataformas)));
+  llenarSelect("fPlataforma", plats);
   llenarSelect("fFormato", formatos, (x) => ETIQUETA_FORMATO[x] || x, hay(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato))));
   llenarSelect("fTienda", tiendas, undefined, hay(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda))));
 }
