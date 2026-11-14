@@ -307,6 +307,24 @@ public static class AutoTests
                       && SteamScraper.ImagenDeBusqueda(H("{}")) == null,
                       "Steam: la imagen sale de la ruta real de la búsqueda (juegos nuevos con código en la ruta)");
         }
+        Verificar(SteamScraper.EsEdicionDe(J("Disco Elysium", "PC"), "Disco Elysium - The Final Cut")
+                  && SteamScraper.EsEdicionDe(J("Spiritfarer", "PC"), "Spiritfarer®: Farewell Edition")
+                  && !SteamScraper.EsEdicionDe(J("Hades", "PC"), "Hollow Knight"),
+                  "Steam por appid: acepta edición/subtítulo agregado, rechaza otro juego");
+        {
+            int n = 0;
+            var (cli, mf, _) = Montar((r, k) =>
+            {
+                n++;
+                return r.RequestUri!.AbsolutePath.Contains("appdetails")
+                    ? ManejadorFalso.Json("{\"2933620\":{\"success\":true,\"data\":{\"header_image\":\"https://img/real/header.jpg?t=1\"}}}")
+                    : ManejadorFalso.Json("{\"total\":1,\"items\":[{\"type\":\"app\",\"name\":\"Call of Duty: Black Ops 6\",\"id\":2933620," +
+                        "\"price\":{\"currency\":\"USD\",\"initial\":6999,\"final\":6999},\"tiny_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2933620/aaa/capsule_231x87.jpg\",\"platforms\":{\"windows\":true}}]}");
+            });
+            var r = new SteamScraper(cli).ConsultarAsync(J("Call of Duty: Black Ops 6", "PC")).Result;
+            Verificar(r.Ok && r.ImagenUrl == "https://img/real/header.jpg?t=1" && mf.Urls.Any(u => u.Contains("filters=basic")),
+                      "Steam (juego nuevo): la imagen grande se pide a appdetails porque no se puede adivinar su ruta", r.ImagenUrl ?? "");
+        }
         Verificar(NormalizadorNombres.Coincide("Cities: Skylines", "Cities: Skylines - Nintendo Switch Edition")
                   && NormalizadorNombres.Coincide("Hades", "Hades Nintendo Switch")
                   && !NormalizadorNombres.Coincide("Nintendo Switch Sports", "Sports"),
