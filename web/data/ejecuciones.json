@@ -1,5 +1,17 @@
 [
  {
+  "fecha": "2026-11-17T17:58:06+00:00",
+  "evento": "schedule",
+  "modo": "real",
+  "resultado": "publicada",
+  "juegos": 249,
+  "con_precio": 249,
+  "duracion_seg": 6315.0,
+  "run_id": "44123082502",
+  "run_url": "https://github.com/mariajimenacarranza4-boop/Japa/actions/runs/44123082502",
+  "errores": []
+ },
+ {
   "fecha": "2026-11-17T03:38:48+00:00",
   "evento": "schedule",
   "modo": "real",
