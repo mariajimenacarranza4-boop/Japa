@@ -1,0 +1,26 @@
+Estimación de la Ley de Amdahl sobre los trabajadores del nivel 1 (f = fracción que no escala)
+S(n) = 1 / (f + (1-f)/n);  límite teórico = 1/f.  Speedup relativo al mismo modo con 1 trabajador.
+
+Solo nivel 1  (base = 4089.5 s)
+  n=12  S= 1.06  f=0.939  límite 1/f=1.07
+  -> f promedio = 0.939
+
+Niveles 1+2  (base = 4089.5 s)
+  n=12  S= 1.12  f=0.879  límite 1/f=1.14
+  -> f promedio = 0.879
+
+Niveles 1+2+3  (base = 3444.4 s)
+  n=1   S= 1.00  (no sirve para estimar)
+  n=2   S= 0.87  (no sirve para estimar)
+  n=4   S= 1.00  (no sirve para estimar)
+  n=12  S= 0.95  (no sirve para estimar)
+
+Niveles 1+2+3  (base = secuencial = 4089.5 s)
+  n=1   S= 1.19  (no sirve para estimar)
+  n=2   S= 1.03  f=0.944  límite 1/f=1.06
+  n=4   S= 1.18  f=0.795  límite 1/f=1.26
+  n=12  S= 1.13  f=0.871  límite 1/f=1.15
+  -> f promedio = 0.870
+
+Nota: la parte 'secuencial' aquí incluye lo que limita el sitio (máx. simultáneas por dominio + pausa),
+no solo código serie. Por eso f sube al aumentar n: el cuello de botella pasa a ser la red/los sitios.
