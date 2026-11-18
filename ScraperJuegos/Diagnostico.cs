@@ -35,8 +35,8 @@ public static class Diagnostico
         return new Sitio[]
         {
             new("Steam", "store.steampowered.com", steam.ToArray()),
-            new("Epic Games Store (directo, 403)", "store.epicgames.com", new[] { "/graphql" }),
-            new("Epic vía CheapShark", "www.cheapshark.com", new[] { $"/api/1.0/deals?storeID={EpicCheapSharkScraper.IdTiendaEpic}&title={q}&exact=1&pageSize=60" }),
+            new("Epic vía CheapShark", "www.cheapshark.com", new[] { "/api/1.0/stores", $"/api/1.0/deals?storeID=25&title={q}&pageSize=20" }),
+        new("Epic vía ITAD (respaldo)", "api.isthereanydeal.com", new[] { "/service/shops/v1", "/games/lookup/v1", "/games/prices/v3" }),
             new("Nintendo eShop (página)", "www.nintendo.com", new[] { "/us/store/products/" }),
             new("Nintendo (búsqueda Algolia)", $"{cfg.NintendoAlgoliaAppId.ToLowerInvariant()}-dsn.algolia.net", new[] { $"/1/indexes/{cfg.NintendoAlgoliaIndex}/query" }),
             new("Eneba", "www.eneba.com", new[] { $"/store/all?text={q}&currency=USD" }),
@@ -191,6 +191,7 @@ public static class Diagnostico
         string slugMuestra = string.IsNullOrWhiteSpace(muestraPs.MetacriticSlug) ? NormalizadorNombres.Slug(muestraPs.NombreParaBuscar) : muestraPs.MetacriticSlug!;
         Decir($"  (juego de muestra tomado del REPO: {muestraPs.Nombre} / {muestraPs.Plataforma})");
         await Capturar("Steam (búsqueda)", $"https://store.steampowered.com/api/storesearch/?term={qs}&cc=us&l=english", "steam_busqueda.json");
+        await Capturar("CheapShark (lista de tiendas; ahí se ve el id de Epic)", "https://www.cheapshark.com/api/1.0/stores", "cheapshark_tiendas.json");
         await Capturar("Eneba (búsqueda)", $"https://www.eneba.com/store/all?text={qs}&currency=USD", "eneba_busqueda.html");
         await Capturar($"Metacritic ({muestraPs.Nombre} {muestraPs.Plataforma})", $"https://www.metacritic.com/game/{slugMuestra}/?platform={muestraPs.Plataforma.ToLowerInvariant()}", "metacritic_muestra.html");
         if (!string.IsNullOrWhiteSpace(hltbId) && hltbId!.All(char.IsDigit))

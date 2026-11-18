@@ -1,35 +1,55 @@
-using System.Text;
+using System.Globalization;
 using System.Text.Json;
 
 namespace ScraperJuegos;
 
 /// <summary>
-/// [NO REGISTRADO] Acceso DIRECTO a Epic: store.epicgames.com responde 403 a las consultas automáticas (11-nov-2026) y el
-/// equipo decidió no evadirlo. Se conserva como evidencia y por si Epic vuelve a permitirlo; la tienda activa es EpicCheapSharkScraper.
-/// Tienda 2: Epic Games Store (solo PC, formato digital), región US (USD).
-/// Usa el endpoint GraphQL que usa la propia tienda (POST https://store.epicgames.com/graphql, consulta searchStoreQuery),
-/// sin HTML ni cuenta. Los precios llegan como ENTEROS en la unidad menor (1999 = 19.99) junto con currencyInfo.decimals.
-/// Una sola solicitud por juego. Sin estado compartido.
-/// Si la respuesta trae "errors" o cambia de forma -> formato_cambiado; si no hay coincidencia segura -> no_encontrado.
+/// Tienda 2: Epic Games Store (solo PC, formato digital, USD), consultada VÍA CheapShark.
+/// Epic bloquea (403) a los clientes automáticos de su propia tienda, así que no se le pide nada a store.epicgames.com:
+/// los precios de Epic se leen de la API pública y gratuita de CheapShark (https://apidocs.cheapshark.com), que no requiere clave.
+///
+/// Flujo (máximo 3 solicitudes por juego; la primera se hace una sola vez por corrida):
+///   1. GET /api/1.0/stores            -> busca por NOMBRE "Epic Games Store" y obtiene su storeID (no se escribe a mano: los ids de
+///                                        tienda de CheapShark han cambiado con el tiempo). Se recuerda mientras viva este objeto.
+///                                        Se puede fijar con CHEAPSHARK_EPIC_STORE_ID (omite esta solicitud).
+///   2. GET /api/1.0/deals?storeID=ID&amp;title=NOMBRE   -> ofertas de Epic cuyo título coincide con el juego.
+///   3. (solo si 2 no encontró nada y el REPO trae steam_appid) GET /api/1.0/deals?storeID=ID&amp;steamAppID=N.
+///
+/// Reglas de cortesía de CheapShark que se cumplen aquí:
+///   - Se respeta su robots.txt como en todo el proyecto (si no permite /api -> bloqueo, sin hacer la solicitud).
+///   - Pausa de 1 s por dominio (LimitadorDominio) y reintento con espera si responde 429.
+///   - Si CheapShark bloquea (403/429 persistente/robots), este scraper deja de insistir durante unos minutos (disyuntor):
+///     Epic queda sin precios, el resto del programa sigue normal.
+///   - El enlace que se entrega es el de su /redirect?dealID=..., que es el que CheapShark pide usar.
+///
+/// RESPALDO: si CheapShark falla (bloqueo, formato cambiado o el juego no aparece) y existe la variable ITAD_API_KEY, Epic se consulta
+/// con la API oficial de IsThereAnyDeal (ver ItadEpicFuente). Sin clave no se hace ninguna solicitud a ITAD.
+///
+/// Los precios llegan como texto decimal ("35.99") en USD. Sin estado por solicitud (solo el id de tienda y el disyuntor, protegidos).
 /// </summary>
 public sealed class EpicGamesScraper : ITiendaScraper
 {
     public string Tienda => "Epic Games Store";
-    public string Dominio => "store.epicgames.com";
+    public string Dominio => "www.cheapshark.com";
     private readonly ClienteHttp _http;
+    private readonly ItadEpicFuente _itad;
 
-    private const string UrlGraphQl = "https://store.epicgames.com/graphql";
+    internal const string UrlBase = "https://www.cheapshark.com/api/1.0";
+    internal const string UrlRedirect = "https://www.cheapshark.com/redirect?dealID=";
+    private static readonly TimeSpan DuracionDisyuntor = TimeSpan.FromMinutes(5);
 
-    // Consulta mínima: solo los campos que se usan (si Epic quita uno, la respuesta trae "errors" y se reporta formato_cambiado).
-    private const string Consulta =
-        "query searchStoreQuery($country: String!, $keywords: String, $locale: String, $count: Int) { " +
-        "Catalog { searchStore(country: $country, keywords: $keywords, locale: $locale, count: $count) { " +
-        "elements { title id productSlug urlSlug keyImages { type url } categories { path } " +
-        "offerMappings { pageSlug pageType } " +
-        "price(country: $country) { totalPrice { discountPrice originalPrice currencyCode currencyInfo { decimals } } } } " +
-        "paging { count total } } } }";
+    private readonly SemaphoreSlim _candado = new(1, 1);
+    private string? _storeId;                 // se llena una vez (o viene de la configuración)
+    private DateTime _bloqueadoHastaUtc;      // disyuntor
+    private string _detalleBloqueo = "";
 
-    public EpicGamesScraper(ClienteHttp http) => _http = http;
+    public EpicGamesScraper(ClienteHttp http)
+    {
+        _http = http;
+        _itad = new ItadEpicFuente(http);
+        if (!string.IsNullOrWhiteSpace(http.Config.CheapSharkEpicStoreId) && http.Config.CheapSharkEpicStoreId!.Trim().All(char.IsDigit))
+            _storeId = http.Config.CheapSharkEpicStoreId.Trim();
+    }
 
     public bool SoportaPlataforma(string plataforma) => plataforma == "PC";
 
@@ -37,137 +57,163 @@ public sealed class EpicGamesScraper : ITiendaScraper
         Seguro.EjecutarAsync(() => ConsultarInternoAsync(juego, ct),
             (tipo, det) => ResultadoTienda.Fallo(Tienda, tipo, det), _http.Log, juego, Tienda, ct);
 
-    private sealed record OfertaEpic(string Titulo, decimal Actual, decimal Regular, string? Moneda, string? Slug, string? Imagen);
+    private sealed record OfertaEpic(string Titulo, decimal Actual, decimal Regular, string? DealId, string? Imagen);
 
     private async Task<ResultadoTienda> ConsultarInternoAsync(Juego juego, CancellationToken ct)
     {
         if (!SoportaPlataforma(juego.Plataforma))
             throw new ScraperException(TipoError.NoEncontrado, $"Epic Games Store solo vende para PC (juego en {juego.Plataforma})");
 
+        ScraperException falloCheapShark;
+        try { return await ConsultarCheapSharkAsync(juego, ct).ConfigureAwait(false); }
+        catch (ScraperException ex) { falloCheapShark = ex; }
+
+        // Respaldo: API oficial de IsThereAnyDeal (solo con ITAD_API_KEY).
+        if (!_itad.Configurada)
+        {
+            // Un "no encontrado" normal no necesita sugerencias; un bloqueo o cambio de formato sí.
+            if (falloCheapShark.Tipo == TipoError.NoEncontrado) throw falloCheapShark;
+            throw new ScraperException(falloCheapShark.Tipo, falloCheapShark.Message + " | respaldo ITAD no configurado: defina ITAD_API_KEY");
+        }
+        try
+        {
+            return await _itad.ConsultarAsync(Tienda, juego, new ContextoLog(juego.Nombre, juego.Plataforma, Tienda), ct).ConfigureAwait(false);
+        }
+        catch (ScraperException exItad)
+        {
+            // Si ITAD también falla se reportan los dos motivos; el tipo es el de ITAD salvo que solo diga "no encontrado".
+            string tipo = exItad.Tipo == TipoError.NoEncontrado ? falloCheapShark.Tipo : exItad.Tipo;
+            throw new ScraperException(tipo, $"CheapShark: {falloCheapShark.Message} | ITAD: {exItad.Message}");
+        }
+    }
+
+    private async Task<ResultadoTienda> ConsultarCheapSharkAsync(Juego juego, CancellationToken ct)
+    {
+        if (DateTime.UtcNow < _bloqueadoHastaUtc)
+            throw new ScraperException(TipoError.Bloqueo, $"CheapShark bloqueó antes en esta corrida; no se insiste ({_detalleBloqueo})");
+
         var ctx = new ContextoLog(juego.Nombre, juego.Plataforma, Tienda);
-        string cuerpo = JsonSerializer.Serialize(new
+        try
         {
-            query = Consulta,
-            variables = new { country = "US", locale = "en-US", keywords = juego.NombreParaBuscar, count = 20 }
-        });
+            string storeId = await ObtenerStoreIdAsync(ctx, ct).ConfigureAwait(false);
 
-        var resp = await _http.EnviarAsync(() =>
-        {
-            var r = new HttpRequestMessage(HttpMethod.Post, UrlGraphQl)
-            { Content = new StringContent(cuerpo, Encoding.UTF8, "application/json") };
-            r.Headers.TryAddWithoutValidation("Referer", "https://store.epicgames.com/");
-            r.Headers.TryAddWithoutValidation("Origin", "https://store.epicgames.com");
-            return r;
-        }, new Uri(UrlGraphQl), ctx, ct).ConfigureAwait(false);
+            // 2) por título
+            string url = $"{UrlBase}/deals?storeID={storeId}&title={Uri.EscapeDataString(juego.NombreParaBuscar)}&pageSize=20";
+            var candidatas = LeerOfertas(await PedirJsonAsync(url, ctx, ct).ConfigureAwait(false), storeId, juego, porSteamAppId: false, out int evaluadas);
 
-        using var doc = JsonDocument.Parse(resp.Cuerpo);
-        var raiz = doc.RootElement;
+            // 3) respaldo por steam_appid (identificador exacto, no depende de cómo se escriba el título)
+            if (candidatas.Count == 0 && !string.IsNullOrWhiteSpace(juego.SteamAppId) && juego.SteamAppId!.Trim().All(char.IsDigit))
+            {
+                string url2 = $"{UrlBase}/deals?storeID={storeId}&steamAppID={juego.SteamAppId.Trim()}&pageSize=20";
+                candidatas = LeerOfertas(await PedirJsonAsync(url2, ctx, ct).ConfigureAwait(false), storeId, juego, porSteamAppId: true, out int ev2);
+                evaluadas += ev2;
+            }
 
-        if (!TryRuta(raiz, out var elementos, "data", "Catalog", "searchStore", "elements") || elementos.ValueKind != JsonValueKind.Array)
-        {
-            string motivo = raiz.ValueKind == JsonValueKind.Object && raiz.TryGetProperty("errors", out var errs)
-                            && errs.ValueKind == JsonValueKind.Array && errs.GetArrayLength() > 0
-                ? "GraphQL devolvió errores: " + (Texto(errs[0], "message") ?? "sin mensaje")
-                : "la respuesta no trae data.Catalog.searchStore.elements";
-            throw new ScraperException(TipoError.FormatoCambiado, motivo);
+            if (candidatas.Count == 0)
+                throw new ScraperException(TipoError.NoEncontrado,
+                    $"ninguna oferta de Epic Games Store (vía CheapShark) coincide con '{juego.NombreParaBuscar}' (se evaluaron {evaluadas})");
+
+            // Varias ediciones (estándar/deluxe): la base es la de menor precio regular (y de ahí la más barata hoy).
+            var elegida = candidatas.OrderBy(c => c.Regular).ThenBy(c => c.Actual).First();
+            if (elegida.Regular <= 0)
+                throw new ScraperException(TipoError.NoEncontrado, "el producto es gratuito o no muestra precio en Epic Games Store");
+
+            string enlace = elegida.DealId != null ? UrlRedirect + EnlaceDealId(elegida.DealId)
+                                                  : "https://www.cheapshark.com/browse?title=" + Uri.EscapeDataString(juego.NombreParaBuscar);
+            return ResultadoTienda.Exito(Tienda, elegida.Actual, elegida.Regular, Catalogos.Digital, "PC", enlace, elegida.Imagen);
         }
-
-        int evaluados = 0;
-        var candidatas = new List<OfertaEpic>();
-        bool algunaConPrecioNoUsd = false;
-        foreach (var el in elementos.EnumerateArray())
+        catch (ScraperException ex) when (ex.Tipo == TipoError.Bloqueo)
         {
-            evaluados++;
-            string? titulo = Texto(el, "title");
-            if (!NormalizadorNombres.CoincideConJuego(juego, titulo)) continue;
-            if (EsExtra(el)) continue; // DLC, banda sonora, etc.
-
-            if (!TryRuta(el, out var total, "price", "totalPrice") || total.ValueKind != JsonValueKind.Object) continue;
-            long? desc = Entero(total, "discountPrice"), orig = Entero(total, "originalPrice");
-            if (desc is null || orig is null) continue;
-            int decimales = TryRuta(total, out var ci, "currencyInfo") && ci.ValueKind == JsonValueKind.Object
-                            && Entero(ci, "decimals") is { } d && d is >= 0 and <= 4 ? (int)d : 2;
-            string? moneda = Texto(total, "currencyCode");
-            if (moneda != null && !moneda.Equals("USD", StringComparison.OrdinalIgnoreCase)) { algunaConPrecioNoUsd = true; continue; }
-
-            decimal divisor = (decimal)Math.Pow(10, decimales);
-            decimal actual = desc.Value / divisor, regular = Math.Max(orig.Value, desc.Value) / divisor;
-            candidatas.Add(new OfertaEpic(titulo!, actual, regular, moneda, Slug(el), Imagen(el)));
+            _bloqueadoHastaUtc = DateTime.UtcNow + DuracionDisyuntor;
+            _detalleBloqueo = ex.Message;
+            throw;
         }
-
-        if (candidatas.Count == 0)
-        {
-            if (algunaConPrecioNoUsd)
-                throw new ScraperException(TipoError.FormatoCambiado, "Epic devolvió precios en otra moneda que USD; no se mezclan monedas");
-            throw new ScraperException(TipoError.NoEncontrado,
-                $"ningún resultado de Epic Games Store coincide con '{juego.NombreParaBuscar}' (se evaluaron {evaluados})");
-        }
-
-        // Varias ediciones (estándar/deluxe): la base es la de menor precio regular (y de ahí la más barata hoy).
-        var elegida = candidatas.OrderBy(c => c.Regular).ThenBy(c => c.Actual).First();
-        if (elegida.Regular <= 0)
-            throw new ScraperException(TipoError.NoEncontrado, "el producto es gratuito o no muestra precio en Epic Games Store");
-
-        string enlace = elegida.Slug != null
-            ? "https://store.epicgames.com/en-US/p/" + Uri.EscapeDataString(elegida.Slug)
-            : "https://store.epicgames.com/en-US/browse?q=" + Uri.EscapeDataString(juego.NombreParaBuscar) + "&sortBy=relevancy";
-        return ResultadoTienda.Exito(Tienda, elegida.Actual, elegida.Regular, Catalogos.Digital, "PC", enlace, elegida.Imagen);
     }
 
-    /// <summary>Descarta contenido que no es el juego (complementos, bandas sonoras...). Si no hay categorías, se acepta.</summary>
-    private static bool EsExtra(JsonElement el)
+    private async Task<string> ObtenerStoreIdAsync(ContextoLog ctx, CancellationToken ct)
     {
-        if (!el.TryGetProperty("categories", out var cats) || cats.ValueKind != JsonValueKind.Array) return false;
-        foreach (var c in cats.EnumerateArray())
+        if (_storeId != null) return _storeId;
+        await _candado.WaitAsync(ct).ConfigureAwait(false);
+        try
         {
-            string? p = Texto(c, "path");
-            if (p != null && (p.StartsWith("addons", StringComparison.OrdinalIgnoreCase)
-                              || p.StartsWith("digitalextras", StringComparison.OrdinalIgnoreCase))) return true;
+            if (_storeId != null) return _storeId;
+            using var doc = await PedirJsonAsync($"{UrlBase}/stores", ctx, ct).ConfigureAwait(false);
+            if (doc.RootElement.ValueKind != JsonValueKind.Array)
+                throw new ScraperException(TipoError.FormatoCambiado, "CheapShark /stores no devolvió una lista de tiendas");
+
+            bool existe = false;
+            foreach (var t in doc.RootElement.EnumerateArray())
+            {
+                string? nombre = Cadena(t, "storeName");
+                if (nombre is null || !nombre.Contains("epic", StringComparison.OrdinalIgnoreCase)) continue;
+                existe = true;
+                string? id = Cadena(t, "storeID");
+                bool activa = Cadena(t, "isActive") is not ("0" or "false");
+                if (activa && !string.IsNullOrWhiteSpace(id) && id!.All(char.IsDigit)) { _storeId = id; return id; }
+            }
+            throw new ScraperException(TipoError.FormatoCambiado, existe
+                ? "CheapShark lista a Epic Games Store pero como tienda inactiva (ya no sigue sus precios)"
+                : "CheapShark ya no lista a Epic Games Store entre sus tiendas");
         }
-        return false;
+        finally { _candado.Release(); }
     }
 
-    private static string? Slug(JsonElement el)
+    private async Task<JsonDocument> PedirJsonAsync(string url, ContextoLog ctx, CancellationToken ct)
     {
-        if (el.TryGetProperty("offerMappings", out var om) && om.ValueKind == JsonValueKind.Array)
-            foreach (var m in om.EnumerateArray())
-                if (Texto(m, "pageSlug") is { Length: > 0 } s) return LimpiarSlug(s);
-        if (Texto(el, "productSlug") is { Length: > 0 } ps) return LimpiarSlug(ps);
-        if (Texto(el, "urlSlug") is { Length: > 0 } us && !us.Contains(' ')) return LimpiarSlug(us);
-        return null;
+        var resp = await _http.ObtenerAsync(url, ctx, ct, new Dictionary<string, string> { ["Accept"] = "application/json" }).ConfigureAwait(false);
+        try { return JsonDocument.Parse(resp.Cuerpo); }
+        catch (JsonException) { throw new ScraperException(TipoError.FormatoCambiado, "CheapShark no devolvió JSON válido"); }
     }
 
-    private static string LimpiarSlug(string s) => s.EndsWith("/home", StringComparison.Ordinal) ? s[..^5] : s;
-
-    private static string? Imagen(JsonElement el)
+    // Sobrecarga: lee y libera el documento.
+    private List<OfertaEpic> LeerOfertas(JsonDocument doc, string storeId, Juego juego, bool porSteamAppId, out int evaluadas)
     {
-        if (!el.TryGetProperty("keyImages", out var ki) || ki.ValueKind != JsonValueKind.Array) return null;
-        string? primera = null;
-        foreach (var k in ki.EnumerateArray())
+        using (doc)
         {
-            string? url = Texto(k, "url");
-            if (url is null) continue;
-            primera ??= url;
-            string? tipo = Texto(k, "type");
-            if (tipo is "OfferImageWide" or "DieselStoreFrontWide" or "Thumbnail") return url;
+            evaluadas = 0;
+            var lista = new List<OfertaEpic>();
+            var raiz = doc.RootElement;
+            if (raiz.ValueKind != JsonValueKind.Array)
+                throw new ScraperException(TipoError.FormatoCambiado, "CheapShark /deals no devolvió una lista de ofertas");
+
+            foreach (var el in raiz.EnumerateArray())
+            {
+                evaluadas++;
+                if (Cadena(el, "storeID") != storeId) continue;   // por si el filtro de tienda no se aplicara
+                string? titulo = Cadena(el, "title");
+                if (!porSteamAppId && !NormalizadorNombres.CoincideConJuego(juego, titulo)) continue;
+                if (porSteamAppId && Cadena(el, "steamAppID") != juego.SteamAppId!.Trim()) continue;
+
+                decimal? actual = Decimal(el, "salePrice"), regular = Decimal(el, "normalPrice");
+                if (actual is null || regular is null) continue;
+                string? thumb = Cadena(el, "thumb");
+                lista.Add(new OfertaEpic(titulo ?? juego.Nombre, actual.Value, Math.Max(regular.Value, actual.Value),
+                                         Cadena(el, "dealID"), thumb is { Length: > 0 } && thumb.StartsWith("https://") ? thumb : null));
+            }
+            return lista;
         }
-        return primera;
     }
 
-    private static bool TryRuta(JsonElement e, out JsonElement resultado, params string[] ruta)
+    /// <summary>
+    /// El dealID de CheapShark ya viene codificado para URL (termina en %3D, trae %2B...). Se usa tal cual, como indica su documentación,
+    /// para no codificarlo dos veces; si trajera caracteres inesperados, ahí sí se codifica.
+    /// </summary>
+    private static string EnlaceDealId(string id) =>
+        id.All(c => char.IsAsciiLetterOrDigit(c) || c is '%' or '-' or '_' or '.' or '~') ? id : Uri.EscapeDataString(id);
+
+    private static string? Cadena(JsonElement e, string prop)
     {
-        resultado = e;
-        foreach (var p in ruta)
+        if (e.ValueKind != JsonValueKind.Object || !e.TryGetProperty(prop, out var v)) return null;
+        return v.ValueKind switch
         {
-            if (resultado.ValueKind != JsonValueKind.Object || !resultado.TryGetProperty(p, out var sig)) return false;
-            resultado = sig;
-        }
-        return true;
+            JsonValueKind.String => v.GetString(),
+            JsonValueKind.Number => v.GetRawText(),
+            JsonValueKind.True => "true",
+            JsonValueKind.False => "false",
+            _ => null
+        };
     }
 
-    private static string? Texto(JsonElement e, string prop) =>
-        e.ValueKind == JsonValueKind.Object && e.TryGetProperty(prop, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
-
-    private static long? Entero(JsonElement e, string prop) =>
-        e.ValueKind == JsonValueKind.Object && e.TryGetProperty(prop, out var v) && v.ValueKind == JsonValueKind.Number && v.TryGetInt64(out var n) ? n : null;
+    private static decimal? Decimal(JsonElement e, string prop) =>
+        Cadena(e, prop) is { } s && decimal.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d) && d >= 0 ? d : null;
 }

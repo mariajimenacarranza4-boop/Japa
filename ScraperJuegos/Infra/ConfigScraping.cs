@@ -28,6 +28,21 @@ public record ConfigScraping
     public string NintendoAlgoliaKey { get; init; } = Environment.GetEnvironmentVariable("NINTENDO_ALGOLIA_KEY") ?? "a29c6927638bfd8cee23993e51e721c9";
     public string NintendoAlgoliaIndex { get; init; } = Environment.GetEnvironmentVariable("NINTENDO_ALGOLIA_INDEX") ?? "store_game_en_us";
 
+    /// <summary>
+    /// Epic Games Store se consulta vía la API pública de CheapShark. El scraper busca el id de la tienda por NOMBRE en /api/1.0/stores;
+    /// si CheapShark lo cambiara o se quisiera ahorrar esa solicitud, se fija aquí con CHEAPSHARK_EPIC_STORE_ID (solo dígitos), sin recompilar.
+    /// </summary>
+    public string? CheapSharkEpicStoreId { get; init; } = Environment.GetEnvironmentVariable("CHEAPSHARK_EPIC_STORE_ID");
+
+    /// <summary>
+    /// Respaldo de Epic: API oficial de IsThereAnyDeal. Clave GRATUITA (crear una app en https://isthereanydeal.com/apps/) en la variable
+    /// ITAD_API_KEY; nunca se escribe en el código ni en el repositorio. Sin clave, el respaldo simplemente no se usa.
+    /// </summary>
+    public string? ItadApiKey { get; init; } = Environment.GetEnvironmentVariable("ITAD_API_KEY");
+
+    /// <summary>Opcional: id de la tienda Epic en ITAD (solo dígitos) para omitir la consulta de /service/shops.</summary>
+    public string? ItadEpicShopId { get; init; } = Environment.GetEnvironmentVariable("ITAD_EPIC_SHOP_ID");
+
     /// <summary>Token con el que se busca nuestro grupo en robots.txt (antes de caer al grupo "*").</summary>
     public string TokenRobots { get; init; } = "ScraperJuegosTEC";
 }

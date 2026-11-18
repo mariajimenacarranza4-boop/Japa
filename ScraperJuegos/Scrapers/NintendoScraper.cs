@@ -120,24 +120,14 @@ public sealed class NintendoScraper : ITiendaScraper
         return BaseSitio + (u.StartsWith('/') ? "" : "/") + u;
     }
 
-    /// <summary>
-    /// La imagen puede venir de tres formas: URL completa, ruta del sitio ("/content/dam/...") o solo el
-    /// IDENTIFICADOR de la imagen en el servidor de imágenes de Nintendo (ej. "ncom/software/switch/7001.../abc").
-    /// En el último caso la URL correcta es https://assets.nintendo.com/image/upload/{transformación}/{id}
-    /// (pegarle www.nintendo.com daría una imagen rota).
-    /// </summary>
-    public static string? Imagen(JsonElement h)
+    private static string? Imagen(JsonElement h)
     {
-        foreach (var campo in new[] { "horizontalHeaderImage", "productImage", "heroBannerImage", "productImageSquare" })
+        foreach (var campo in new[] { "productImage", "productImageSquare", "horizontalHeaderImage", "heroBannerImage" })
         {
-            string? u = Texto(h, campo)?.Trim();
+            string? u = Texto(h, campo);
             if (string.IsNullOrWhiteSpace(u)) continue;
             if (u.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return u;
-            if (u.StartsWith("//")) return "https:" + u;
-            if (u.StartsWith('/')) return BaseSitio + u;
-            if (u.Contains("image/upload/", StringComparison.OrdinalIgnoreCase))
-                return "https://assets.nintendo.com/" + u.TrimStart('/');
-            return "https://assets.nintendo.com/image/upload/f_auto,q_auto,w_920/" + u;
+            return BaseSitio + (u.StartsWith('/') ? "" : "/") + u;
         }
         return null;
     }

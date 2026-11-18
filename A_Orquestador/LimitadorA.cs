@@ -33,14 +33,21 @@ public sealed class LimitadorA : ILimitadorSolicitudes
     public int MaxPorSitio { get; }   // CONFIGURABLE: peticiones simultáneas por sitio
     public int PausaMs { get; }       // CONFIGURABLE: separación mínima entre inicios de peticiones
 
-    public LimitadorA(int maxPorSitio = 3, int pausaMs = 100)
+    // Límites propios de un sitio que es más sensible que el resto (ej. Eneba aplica límites de uso: 429/bloqueos).
+    private readonly Dictionary<string, (int Max, int PausaMs)> _porSitio = new(StringComparer.OrdinalIgnoreCase);
+
+    public LimitadorA(int maxPorSitio = 3, int pausaMs = 100,
+                      IReadOnlyDictionary<string, (int Max, int PausaMs)>? porSitio = null)
     {
         MaxPorSitio = Math.Max(1, maxPorSitio);
         PausaMs = Math.Max(0, pausaMs);
+        if (porSitio != null)
+            foreach (var (dominio, cfg) in porSitio)
+                _porSitio[dominio] = (Math.Max(1, cfg.Max), Math.Max(0, cfg.PausaMs));   // solo se lee después: sin condiciones de carrera
     }
 
     private Sitio Obtener(string dominio) =>
-        _sitios.GetOrAdd(dominio, _ => new Sitio(MaxPorSitio, PausaMs));
+        _sitios.GetOrAdd(dominio, d => _porSitio.TryGetValue(d, out var c) ? new Sitio(c.Max, c.PausaMs) : new Sitio(MaxPorSitio, PausaMs));
 
     public async Task<IDisposable> EntrarAsync(string dominio, CancellationToken ct = default)
     {

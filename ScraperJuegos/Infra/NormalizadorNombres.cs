@@ -30,8 +30,6 @@ public static class NormalizadorNombres
         // Algunas fuentes (ej. claves de Eneba) agregan la plataforma al título ("ELDEN RING PS4 & PS5"): la etiqueta
         // de plataforma NO es parte del nombre (la plataforma se verifica aparte). Los más largos van primero.
         "ps4 and ps5", "ps5 and ps4", "ps4 ps5", "ps5", "ps4",
-        // Igual con Nintendo: "Cities: Skylines - Nintendo Switch Edition", "X Nintendo Switch 2 Edition".
-        "nintendo switch 2 edition", "nintendo switch edition", "switch edition", "nintendo switch",
         "digital deluxe edition", "deluxe edition", "standard edition", "ultimate edition", "complete edition",
         "gold edition", "premium edition", "game of the year edition", "goty edition", "goty",
         "directors cut", "director s cut", "definitive edition", "special edition", "remastered", "deluxe", "edition"

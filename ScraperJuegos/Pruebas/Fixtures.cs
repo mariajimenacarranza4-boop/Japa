@@ -43,23 +43,42 @@ public static class Fixtures
       "gamePlatform":["{{{{plataforma}}}}"],{{{{(fecha == null ? "" : "\"datePublished\":\"" + fecha + "\",")}}}}"aggregateRating":{"@type":"AggregateRating","ratingValue":"{{{{score}}}}","bestRating":"100"}}</script></head><body></body></html>
     """;
 
-    // ---- CheapShark /api/1.0/deals (Epic, storeID 25): forma real simplificada; los precios llegan como TEXTO ----
-    public static string CheapSharkDeals(params (string titulo, string venta, string normal, string storeId)[] ofertas) =>
-        "[" + string.Join(",", ofertas.Select((o, i) =>
-            "{\"internalName\":\"X\",\"title\":\"" + o.titulo + "\",\"dealID\":\"abc" + i + "%3D\",\"storeID\":\"" + o.storeId +
-            "\",\"gameID\":\"1\",\"salePrice\":\"" + o.venta + "\",\"normalPrice\":\"" + o.normal +
-            "\",\"isOnSale\":\"1\",\"savings\":\"40.006668\",\"thumb\":\"https://img/cs" + i + ".jpg\"}")) + "]";
+    // ---- Epic Games Store vía CheapShark (API pública), Nintendo eShop (Algolia) y Eneba (JSON-LD): forma real simplificada ----
 
-    // ---- Epic Games Store (GraphQL), Nintendo eShop (Algolia) y Eneba (JSON-LD): forma real simplificada ----
+    /// <summary>GET /api/1.0/stores: lista de tiendas; los ids y banderas vienen como texto/número igual que en la API real.</summary>
+    public static string CheapSharkTiendas(string epicId = "25", bool epicActiva = true) =>
+        "[{\"storeID\":\"1\",\"storeName\":\"Steam\",\"isActive\":1,\"images\":{\"banner\":\"/img/stores/banners/0.png\"}}," +
+        "{\"storeID\":\"" + epicId + "\",\"storeName\":\"Epic Games Store\",\"isActive\":" + (epicActiva ? "1" : "0") + ",\"images\":{}}," +
+        "{\"storeID\":\"7\",\"storeName\":\"GOG\",\"isActive\":1,\"images\":{}}]";
 
-    public static string EpicRespuesta(string titulo, long descuento, long original, string moneda = "USD", string categoria = "games/edition/base") =>
-        "{\"data\":{\"Catalog\":{\"searchStore\":{\"elements\":[" +
-        "{\"title\":\"" + titulo + " Soundtrack\",\"id\":\"x1\",\"productSlug\":null,\"urlSlug\":\"sound\",\"keyImages\":[],\"categories\":[{\"path\":\"addons\"}],\"offerMappings\":[]," +
-        "\"price\":{\"totalPrice\":{\"discountPrice\":999,\"originalPrice\":999,\"currencyCode\":\"USD\",\"currencyInfo\":{\"decimals\":2}}}}," +
-        "{\"title\":\"" + titulo + "\",\"id\":\"x2\",\"productSlug\":\"elden-ring/home\",\"urlSlug\":\"elden\",\"keyImages\":[{\"type\":\"Thumbnail\",\"url\":\"https://img/epic.png\"}]," +
-        "\"categories\":[{\"path\":\"" + categoria + "\"}],\"offerMappings\":[{\"pageSlug\":\"elden-ring\",\"pageType\":\"productHome\"}]," +
-        "\"price\":{\"totalPrice\":{\"discountPrice\":" + descuento + ",\"originalPrice\":" + original + ",\"currencyCode\":\"" + moneda + "\",\"currencyInfo\":{\"decimals\":2}}}}" +
-        "]}}}}";
+    /// <summary>Una oferta de GET /api/1.0/deals (precios como texto decimal; dealID ya codificado para URL).</summary>
+    public static string CheapSharkOferta(string titulo, string venta, string normal, string storeId = "25", string dealId = "AbC%2Bxyz%3D",
+                                          string steamAppId = "1245620", string thumb = "https://img/epic.png") =>
+        "{\"internalName\":\"X\",\"title\":\"" + titulo + "\",\"metacriticLink\":\"/game/pc/x\",\"dealID\":\"" + dealId + "\",\"storeID\":\"" + storeId + "\"," +
+        "\"gameID\":\"1\",\"salePrice\":\"" + venta + "\",\"normalPrice\":\"" + normal + "\",\"isOnSale\":\"1\",\"savings\":\"40.0\"," +
+        "\"steamAppID\":\"" + steamAppId + "\",\"thumb\":\"" + thumb + "\"}";
+
+    // ---- IsThereAnyDeal (respaldo de Epic): forma real simplificada de https://docs.isthereanydeal.com ----
+    public const string ItadGameId = "018d937f-07fc-72ed-8517-d8e24cb1eb22";
+
+    public static string ItadTiendas(bool epic = true) =>
+        "[{\"id\":61,\"title\":\"Steam\",\"deals\":10,\"games\":20,\"update\":null}" +
+        (epic ? ",{\"id\":16,\"title\":\"Epic Game Store\",\"deals\":5,\"games\":9,\"update\":null}" : "") + "]";
+
+    public static string ItadLookup(bool encontrado = true, string slug = "elden-ring", string titulo = "ELDEN RING") =>
+        encontrado ? "{\"found\":true,\"game\":{\"id\":\"" + ItadGameId + "\",\"slug\":\"" + slug + "\",\"title\":\"" + titulo + "\",\"type\":\"game\",\"mature\":false,\"assets\":{}}}"
+                   : "{\"found\":false}";
+
+    public static string ItadBusqueda(params (string titulo, string tipo)[] items) =>
+        "[" + string.Join(",", items.Select((x, i) => "{\"id\":\"" + (i == 0 ? ItadGameId : "0000000" + i) + "\",\"slug\":\"s" + i + "\",\"title\":\"" + x.titulo + "\",\"type\":\"" + x.tipo + "\",\"mature\":false,\"assets\":{}}")) + "]";
+
+    public static string ItadPrecios(string actual, string regular, string shopId = "16", string moneda = "USD", string? url = "https://isthereanydeal.com/redirect/epic-elden-ring") =>
+        "[{\"id\":\"" + ItadGameId + "\",\"historyLow\":{},\"deals\":[{\"shop\":{\"id\":" + shopId + ",\"name\":\"Epic Game Store\"}," +
+        "\"price\":{\"amount\":" + actual + ",\"amountInt\":0,\"currency\":\"" + moneda + "\"}," +
+        "\"regular\":{\"amount\":" + regular + ",\"amountInt\":0,\"currency\":\"" + moneda + "\"},\"cut\":40,\"voucher\":null,\"flag\":null,\"drm\":[],\"platforms\":[]," +
+        "\"timestamp\":\"2026-11-14T10:00:00+01:00\",\"expiry\":null" + (url != null ? ",\"url\":\"" + url + "\"" : "") + "}]}]";
+
+    public static string CheapSharkOfertas(params string[] ofertas) => "[" + string.Join(",", ofertas) + "]";
 
     /// <param name="venta">"null" o un número, tal como va en el JSON. Forma real de Nintendo: price { regPrice, salePrice, finalPrice }.</param>
     public static string NintendoRespuesta(string titulo, string plataforma, string msrp, string venta) =>

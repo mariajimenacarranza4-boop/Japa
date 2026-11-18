@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -14,6 +14,10 @@ namespace ScraperJuegos;
 ///    si no se puede confirmar la plataforma -> no_encontrado.
 ///  - Solo claves GLOBALES o sin región (se descartan EU / US / UK / LATAM / ASIA...), porque una clave de otra región puede no activarse.
 ///  - Solo precios en USD (si Eneba responde en otra moneda -> formato_cambiado; jamás se mezclan monedas con las otras tiendas).
+///  - AÑO en el título: si trae "(2014)" y el juego del REPO salió en otro año (más de 2 de diferencia) NO es el mismo juego
+///    (ej. "Lords of the Fallen (2014)" vs el de 2023) -> no_encontrado.
+///  - PISO de precio: un precio menor al 10 % del precio_sugerido del REPO se trata como anómalo (listado erróneo, clave sin
+///    stock real, edición equivocada) y se descarta -> no_encontrado. Configurable con ENEBA_PRECIO_MIN_PCT (0 lo desactiva).
 ///  - Eneba no tiene "precio regular" (es un mercado): precio_regular se omite y la oferta se evalúa contra el precio_sugerido del REPO.
 /// Es la fuente MÁS propensa a bloqueo (suele usar anti-bots): bloqueo/formato_cambiado son resultados esperables y controlados.
 /// Sin estado compartido: 1 solicitud por juego.
@@ -51,7 +55,32 @@ public sealed class EnebaScraper : ITiendaScraper
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
         StringComparer.OrdinalIgnoreCase);
 
+    // Año entre paréntesis en el título de la clave: "DOOM (2016) GOG Key". Solo entre paréntesis para no confundir "Battlefield 2042".
+    private static readonly Regex AnioEntreParentesis = new(@"\(((?:19|20)\d{2})\)", RegexOptions.Compiled);
+    private const int ToleranciaAnios = 2;
+
+    /// <summary>Porcentaje mínimo del precio_sugerido por debajo del cual el precio se considera anómalo (por defecto 10).</summary>
+    private static readonly decimal PisoPct =
+        decimal.TryParse(Environment.GetEnvironmentVariable("ENEBA_PRECIO_MIN_PCT"), NumberStyles.Number, CultureInfo.InvariantCulture, out var v) && v >= 0
+            ? v : 10m;
+
     public EnebaScraper(ClienteHttp http) => _http = http;
+
+    /// <summary>Año entre paréntesis del título de la clave, o null si no trae.</summary>
+    internal static int? AnioEnTitulo(string? crudo)
+    {
+        if (string.IsNullOrWhiteSpace(crudo)) return null;
+        var m = AnioEntreParentesis.Match(crudo);
+        return m.Success ? int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture) : null;
+    }
+
+    /// <summary>Sin año en el título -> compatible (no se puede refutar). Con año: debe estar a ±2 del año de lanzamiento del REPO.</summary>
+    internal static bool AnioCompatible(Juego juego, string? tituloCrudo) =>
+        AnioEnTitulo(tituloCrudo) is not int a || Math.Abs(a - juego.FechaLanzamiento.Year) <= ToleranciaAnios;
+
+    /// <summary>¿Precio absurdamente bajo frente al sugerido? (lo usa también A para limpiar datos viejos del catálogo).</summary>
+    public static bool PrecioSospechoso(decimal precio, decimal precioSugerido) =>
+        PisoPct > 0 && precioSugerido > 0 && precio < precioSugerido * PisoPct / 100m;
 
     public bool SoportaPlataforma(string plataforma) => Catalogos.Plataformas.Contains(plataforma);
 
@@ -98,7 +127,8 @@ public sealed class EnebaScraper : ITiendaScraper
                 "los bloques JSON de Eneba no contienen productos con precio y moneda (¿cambió el formato o no hubo resultados?)");
 
         var coinciden = productos.Where(p => (p.Tipo is null || p.Tipo == "game")   // sin DLC
-                                      && NormalizadorNombres.CoincideConJuego(juego, NombreBase(p.Nombre))).ToList();
+                                      && NormalizadorNombres.CoincideConJuego(juego, NombreBase(p.Nombre))
+                                      && AnioCompatible(juego, p.Nombre)).ToList();   // otro año = otro juego
         if (coinciden.Count == 0)
             throw new ScraperException(TipoError.NoEncontrado,
                 $"ningún resultado de Eneba coincide con '{juego.NombreParaBuscar}' (se evaluaron {productos.Count})");
@@ -119,7 +149,12 @@ public sealed class EnebaScraper : ITiendaScraper
             throw new ScraperException(TipoError.FormatoCambiado,
                 $"Eneba devolvió precios en {globales[0].Moneda ?? "una moneda desconocida"} y no en USD; no se mezclan monedas");
 
-        var elegido = enUsd.OrderBy(p => p.Precio).First();
+        var razonables = enUsd.Where(p => !PrecioSospechoso(p.Precio, juego.PrecioSugerido)).ToList();
+        if (razonables.Count == 0)
+            throw new ScraperException(TipoError.NoEncontrado,
+                $"los precios de Eneba para '{juego.Nombre}' ({enUsd.Min(p => p.Precio)} USD) son anómalos frente al sugerido del REPO ({juego.PrecioSugerido} USD); se descartan");
+
+        var elegido = razonables.OrderBy(p => p.Precio).First();
         // Eneba informa un "msrp" (precio de referencia) en algunos productos; si no, no hay precio regular y la oferta
         // se evalúa contra el precio sugerido del REPO.
         decimal? regular = elegido.Regular is > 0 && elegido.Regular >= elegido.Precio ? elegido.Regular : null;

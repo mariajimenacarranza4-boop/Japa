@@ -27,7 +27,7 @@ El REPO es el archivo `Data/juegos.csv` (UTF-8, separado por `;`). Una **fila = 
 | `metacritic_slug` | no | Parte de la URL de Metacritic (`elden-ring`) |
 | `hltb_id` | no | Id numérico de HowLongToBeat (ruta más estable que la búsqueda) |
 
-**Tamaño:** 249 juegos distintos (660 filas por plataforma). El enunciado pide 200 juegos: se cuentan juegos
+**Tamaño:** 249 juegos distintos (659 filas por plataforma). El enunciado pide 200 juegos: se cuentan juegos
 *distintos*, no filas, y por eso el programa lo reporta así (`dotnet run`). El archivo original tenía 136 juegos
 distintos (347 filas), que habría fallado el requisito.
 
@@ -55,7 +55,7 @@ a Firebase/Supabase (colección `repo_juegos`).
 | Fuente | Qué da | Cómo se consulta | Plataformas |
 |---|---|---|---|
 | **Steam** (tienda 1) | precio actual, regular, enlace, imagen | JSON de la propia tienda: `/api/storesearch` (1 solicitud/juego); `/api/appdetails` si el REPO trae `steam_appid`. USD (`cc=us`) | PC |
-| **Epic Games Store** (tienda 2, **vía CheapShark**) | precio actual, regular, enlace, imagen | La tienda directa responde 403 y no se evade. Se usa la API pública y gratuita de CheapShark, un comparador de precios que rastrea Epic: `GET www.cheapshark.com/api/1.0/deals?storeID=25&title=...&exact=1` (y `exact=0` solo si no hay coincidencia exacta). Precios en USD como texto; enlace por el redireccionador de CheapShark a la página del juego en Epic. **El dato llega por intermediario y puede tener horas de atraso.** | PC |
+| **Epic Games Store** (tienda 2) | precio actual, regular, enlace, imagen | **vía CheapShark** (API pública, sin clave, USD): `GET /api/1.0/stores` (id de Epic por nombre, 1 vez por corrida) y `GET /api/1.0/deals?storeID=ID&title=...` (respaldo por `steamAppID` si el REPO lo trae). Enlace = `cheapshark.com/redirect?dealID=...` (el que CheapShark pide usar). Si CheapShark falla (bloqueo, formato o juego no encontrado) y existe `ITAD_API_KEY`, se usa como **respaldo la API oficial de IsThereAnyDeal** (`/service/shops/v1`, `/games/lookup/v1`, `/games/search/v1`, `/games/prices/v3`; clave en cabecera, USD). Sin respaldo, la tienda queda sin precios sin afectar a las demás | PC |
 | **Nintendo eShop** (tienda 3) | precio actual, regular, enlace, imagen | índice de búsqueda de nintendo.com (Algolia, clave pública de solo búsqueda, configurable por `NINTENDO_ALGOLIA_KEY`); campos `msrp` / `salePrice` | Switch |
 | **Eneba** (tienda 4) | precio de la clave más barata (sin precio regular), enlace, imagen | página de búsqueda; solo datos estructurados schema.org (JSON-LD). Solo claves GLOBAL, solo USD, plataforma deducida del nombre | PC, PS5, PS4, Xbox, Switch |
 | **Metacritic** | Metascore **de la consola del REPO** | `/game/{slug}/?platform={plataforma}`; JSON-LD y, de respaldo, HTML | todas |
@@ -73,7 +73,7 @@ El mismo juego se llama distinto en cada sitio (`EA SPORTS FC™ 24`, `ELDEN RIN
 2. **Coincidencia = nombres normalizados iguales.** Por eso `Doom` ≠ `Doom Eternal`, `God of War` ≠ `God of War Ragnarök`,
    `FIFA 23` ≠ `FIFA 22`.
 3. **Verificar plataforma** en cada fuente (Steam: Windows; Nintendo: Switch; Eneba: la plataforma deducida del título; Metacritic: `gamePlatform`).
-   En Epic (vía CheapShark) se descartan los títulos que no coinciden con el juego (DLC, bandas sonoras, ediciones con otro nombre) y, entre ediciones del mismo juego, se toma la más barata (la base).
+   En Epic (vía CheapShark) solo cuentan ofertas cuyo título coincide con el juego (se descartan bandas sonoras y otros títulos) y, entre ediciones del mismo juego, se toma la de menor precio regular (la base).
 4. **Si hay duda se devuelve `no_encontrado`; nunca se adivina.** En HLTB, ante varios juegos con el mismo nombre
    (remakes) el `hltb_id` del REPO identifica el juego exacto, y el scraper verifica que el nombre de la página coincida.
 5. Si un nombre legítimo no coincide (ej. PC: *Marvel's Spider-Man* vs *Marvel's Spider-Man Remastered*), se corrige en el
@@ -115,7 +115,8 @@ Además: User-Agent honesto (`ScraperJuegosTEC/1.0 (proyecto academico IC3101 TE
 |---|---|---|
 | store.steampowered.com | Fuentes secundarias indican que su `robots.txt` es abierto, y que `api.steampowered.com` sí prohíbe acceso automatizado (por eso **no** se usa). | Verificar el `robots.txt` y los Términos de Steam y anotar fecha |
 | store.playstation.com | **PlayStation Store se eliminó del proyecto (decisión del equipo).** Evidencia (11-nov-2026, `dotnet run -- diagnostico`): `robots.txt` permite `/en-us/search/` y la página responde HTTP 200, pero el HTML ya no trae resultados (solo casillas de carga); los productos los pide el navegador a una API interna sin documentación pública, que no se considera apropiado leer sin autorización. | Mencionar en el informe como limitación: PS4/PS5 conservan Metacritic, HowLongToBeat y los precios de Eneba (claves) |
-| store.epicgames.com | **Observado el 11-nov-2026 con `dotnet run -- diagnostico`:** la tienda responde HTTP 403 (acceso denegado) a las consultas automáticas. El scraper lo clasifica como `bloqueo`, no reintenta y no intenta evadirlo (respeto a los términos y a las medidas anti-bots del sitio). **Decisión:** no se evade; los precios de Epic se obtienen de la API pública de CheapShark (`EpicCheapSharkScraper`, ver 3.1). El acceso directo (`EpicGamesScraper`) queda en el código como evidencia, sin registrar. | Anotar la fecha de la revisión de `robots.txt` y términos con el `informe.txt` |
+| store.epicgames.com | **Observado el 11-nov-2026 con `dotnet run -- diagnostico`:** la tienda responde HTTP 403 (acceso denegado) a las consultas automáticas. No se intenta evadirlo (respeto a los términos y a las medidas anti-bots del sitio). **Decisión (14-nov-2026):** ya NO se consulta store.epicgames.com; los precios de Epic se leen de CheapShark (fila siguiente). | — |
+| www.cheapshark.com (Epic vía su API) | **API pública y gratuita, sin clave** (documentación: apidocs.cheapshark.com, revisada el 14-nov-2026). Pide: usar sus enlaces `/redirect`, y no hacer ráfagas automáticas (responde 429 y puede bloquear de forma permanente). El scraper pide ≤3 solicitudes por juego a 1 s de pausa, recuerda el id de tienda, respeta `robots.txt` y, ante bloqueo, deja de insistir (disyuntor de 5 min). **Probado solo con datos simulados**; la prueba real (`probar 10` y `diagnostico`) le toca a B. | Correr `diagnostico`, confirmar PERMITIDO para `/api/1.0/` y anotar la fecha en 3.5b |
 | nintendo.com / algolia.net | No verificado. La clave de búsqueda es pública pero puede rotar (403 -> `bloqueo`); el índice puede cambiar de nombre (`NINTENDO_ALGOLIA_INDEX`) | Revisar términos de Nintendo y `robots.txt` de ambos dominios |
 | eneba.com | No verificado. Es el sitio más propenso a anti-bots; `bloqueo` / `formato_cambiado` son resultados esperables. La vía oficial es su API de afiliados (requiere registro) | Revisar `robots.txt`/términos; si bloquea, documentarlo como limitación |
 | metacritic.com | No verificado. Es la fuente más propensa a bloqueo y sus términos son restrictivos | Revisar; si bloquea, documentar el cambio |
@@ -141,14 +142,14 @@ Una fila por sitio. Fecha = día en que se abrió el `robots.txt` y la página d
 | Metacritic | metacritic.com/robots.txt | fandom.com/terms-of-use | ____ | ____ |
 | HowLongToBeat | howlongtobeat.com/robots.txt | howlongtobeat.com (términos) | ____ | `/api` prohibido; solo `/game/ID` |
 | Wikidata | wikidata.org/robots.txt | API etiquette de Wikimedia | ____ | API pública, 1 solicitud/s |
-| CheapShark (Epic) | cheapshark.com/robots.txt | apidocs.cheapshark.com | 14-nov-2026 | **`Disallow: /api/1.0/`**: el robots.txt prohíbe la API, así que el scraper no la consulta (bloqueo controlado). Epic queda apagada (`TIENDAS_DESACTIVADAS`) |
-| Epic (directo) | store.epicgames.com/robots.txt | epicgames.com/site/es-ES/tos | 11-nov-2026 | Responde 403 a consultas automáticas; no se evade (se usa CheapShark) |
+| IsThereAnyDeal (respaldo de Epic) | api.isthereanydeal.com/robots.txt | docs.isthereanydeal.com (API oficial con clave gratuita; revisada la documentación el 14-nov-2026: pide no abusar, límite 1000 solicitudes/5 min, caché) | ____ (B: día de la corrida de `diagnostico`) | Clave en variable de entorno `ITAD_API_KEY` (nunca en el repositorio); ≤3 solicitudes por juego a 1 s; solo se usa si CheapShark falla. robots.txt: ____ |
+| CheapShark (Epic Games Store) | www.cheapshark.com/robots.txt | apidocs.cheapshark.com (API pública sin clave; revisada la documentación el 14-nov-2026) | ____ (B: día de la corrida de `diagnostico`) | `/api/1.0/stores` y `/api/1.0/deals`; sin clave; enlaces `/redirect`; ≤3 solicitudes por juego a 1 s. robots.txt: ____ (PERMITIDO / BLOQUEADO, ver sección "Epic vía CheapShark" de `informe.txt`) |
 
 Adjuntar `salida/diagnostico/informe.txt` de la corrida de `diagnostico` como evidencia.
 
 ### 3.6 Limitaciones conocidas (para la defensa)
 - **Formato físico:** las tiendas implementadas solo venden digital; el filtro "físico" queda vacío. Amazon y similares bloquean el scraping y el reparto indica no pelear con bloqueos. Decisión del equipo: ____.
-- **Cobertura de tiendas:** PC tiene Steam y Eneba (Epic Games Store queda apagada: la tienda directa responde 403 y el robots.txt de CheapShark prohíbe su API; ver 3.5b); Switch tiene Nintendo eShop y Eneba; PS4, PS5 y Xbox solo tienen Eneba (PlayStation Store se eliminó). **En las pruebas reales, Eneba no devolvió claves de PlayStation para ningún juego (solo PC y Xbox)**: las versiones de PS4/PS5 quedan sin precio; los juegos multiplataforma tienen precio por sus otras plataformas y solo 6 exclusivos de PlayStation (Bloodborne, Gran Turismo 7, Astro Bot, Demon's Souls, Death Stranding 2, Ghost of Yōtei) quedan sin ninguna tienda. Se evaluó la API de PlatPrices (requiere clave) y el equipo decidió no depender de un servicio con clave. Con el REPO actual, 184 de 249 juegos tenían precio en 2 tiendas distintas antes de agregar Epic (volver a contar con `dotnet run`). Si Eneba bloquea, PS y Xbox quedan sin precio.
+- **Cobertura de tiendas:** PC tiene Steam, Epic (vía CheapShark; sin precios si CheapShark bloquea) y Eneba; Switch tiene Nintendo eShop y Eneba; PS4, PS5 y Xbox solo tienen Eneba (PlayStation Store se eliminó). Con el REPO actual, 184 de 249 juegos tienen precio en 2 tiendas distintas. Si Eneba bloquea, PS y Xbox quedan sin precio.
 - **REPO local:** vive en `Data/juegos.csv` (cumple "dinámico"); `exportar` genera el JSON para cargarlo a la nube si el equipo lo decide.
 
 ### HowLongToBeat: por qué `/game/ID` y de dónde salen las horas y fechas
@@ -194,7 +195,7 @@ son seguros entre hilos (la caché usa `Lazy<Task>` por dominio: 60 juegos en pa
 A inyecta su propio `ILimitadorSolicitudes`; si no, se usa `LimitadorDominio` (semáforo por dominio + pausa mínima).
 
 ## Verificación
-`dotnet run -- autotest` ejecuta las pruebas sin internet (REPO, nombres, oferta, las 4 tiendas + Metacritic + HLTB con cada tipo de error,
+`dotnet run -- autotest` ejecuta las pruebas sin internet (REPO, nombres, oferta, las 4 tiendas (Epic vía CheapShark con respaldo ITAD, disyuntor y robots.txt) + Metacritic + HLTB con cada tipo de error,
 robots.txt, reintentos, límite por dominio, 60 juegos en 16 hilos). **Las pruebas usan respuestas simuladas con la forma que
 tienen los sitios; no prueban los sitios reales.** Contra los sitios reales: `dotnet run -- probar 10`.
 

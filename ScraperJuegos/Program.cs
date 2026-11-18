@@ -9,7 +9,7 @@ Console.OutputEncoding = System.Text.Encoding.UTF8;
 // ---------------------------------------------------------------------------------
 //  ScraperJuegos - parte de B (REPO + scrapers).  Uso:
 //    dotnet run                              resumen y validación del REPO (200+ juegos)
-//    dotnet run -- probar [N]                corre las 4 tiendas + Metacritic + HLTB sobre N juegos del REPO (por defecto 5)
+//    dotnet run -- probar [N]                corre las 4 tiendas (Epic vía CheapShark) + Metacritic + HLTB sobre N juegos del REPO (por defecto 5)
 //    dotnet run -- probar --juego "X"        un juego; si NO está en el REPO se consulta igual (opcional: --plataforma PS5 --precio 59.99 --anio 2023)
 //    dotnet run -- hltb-pendientes           lista los juegos del REPO que aún no tienen hltb_id (salida/hltb_pendientes.csv)
 //    dotnet run -- hltb-importar [--archivo X.csv]  copia los ids que llenó en hltb_pendientes.csv hacia Data/juegos.csv
