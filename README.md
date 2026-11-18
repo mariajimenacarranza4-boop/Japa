@@ -3,7 +3,7 @@
 IC3101 Arquitectura de Computadoras · TEC San Carlos
 
 **Sitio público:** https://USUARIO.github.io/REPOSITORIO/ *(reemplazar)*
-**Documento técnico:** [docs/Documentacion_Tecnica.md](docs/Documentacion_Tecnica.md) · **Guion de la demo:** [docs/Guion_Demo.md](docs/Guion_Demo.md)
+**Documento técnico:** [docs/Documento_Tecnico_JAPA_unificado.pdf](docs/Documento_Tecnico_JAPA_unificado.pdf) · **Guion de la demo:** [docs/Guion_Demo.md](docs/Guion_Demo.md)
 
 [![Actualizar catálogo](../../actions/workflows/actualizar-catalogo.yml/badge.svg)](../../actions/workflows/actualizar-catalogo.yml)
 
