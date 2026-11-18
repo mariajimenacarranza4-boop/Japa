@@ -135,8 +135,10 @@ function construirOpciones() {
   // Tienda: solo las que tienen al menos un precio (ej. Epic, apagada, no aparece).
   const tiendasConPrecio = new Set(estado.juegos.flatMap((j) => j.tiendas.map((t) => t.tienda)));
   const tiendas = union(v.tiendas, [...tiendasConPrecio]).filter((t) => tiendasConPrecio.has(t));
-  const formatos = union(v.formatos, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato).filter(Boolean)));
-  const tipos = union(v.tipos_de_juego || ["digital", "fisico", "otro"], []);
+  // "Físico" y "Otro" no se ofrecen: ninguna tienda implementada vende formato físico (ver documento, sección 3.6).
+  const OCULTOS = new Set(["fisico", "otro"]);
+  const formatos = union(v.formatos, estado.juegos.flatMap((j) => j.tiendas.map((t) => t.formato).filter(Boolean))).filter((x) => !OCULTOS.has(x));
+  const tipos = union(v.tipos_de_juego || ["digital"], []).filter((x) => !OCULTOS.has(x));
   const hay = (lista) => new Set(lista);
   llenarSelect("fTipo", tipos, (x) => ETIQUETA_FORMATO[x] || x, hay(estado.juegos.map((j) => j.tipo)));
   llenarSelect("fPlataforma", plats);
