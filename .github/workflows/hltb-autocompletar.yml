@@ -1,0 +1,50 @@
+# Completa los hltb_id que faltan en el REPO usando el comando de B (busca cada juego en Wikidata, 1 solicitud por segundo)
+# y guarda el REPO actualizado en el repositorio. Se ejecuta A MANO: Actions → Completar hltb_id → Run workflow.
+# Después, la siguiente "Actualizar catálogo" ya trae los tiempos de How Long To Beat.
+name: Completar hltb_id
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actualizar-catalogo   # nunca al mismo tiempo que una actualización del catálogo
+  cancel-in-progress: false
+
+jobs:
+  hltb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Buscar hltb_id faltantes (Wikidata) y escribirlos en el REPO
+        env:
+          SECRETO_CONTACTO: ${{ secrets.SCRAPER_CONTACTO }}
+        working-directory: ScraperJuegos
+        run: |
+          if [ -n "$SECRETO_CONTACTO" ]; then export SCRAPER_CONTACTO="$SECRETO_CONTACTO"; fi
+          mkdir -p "$RUNNER_TEMP/hltb"
+          dotnet run -c Release -- hltb-autocompletar --aplicar --repo Data/juegos.csv --salida "$RUNNER_TEMP/hltb"
+          # Reporte (encontrados y faltantes, con enlace de búsqueda) guardado en el repo para completar a mano lo que falte.
+          cp "$RUNNER_TEMP/hltb/hltb_autocompletar.csv" docs/hltb_autocompletar.csv 2>/dev/null || true
+          echo "Juegos con hltb_id ahora: $(awk -F';' 'NR>1 && $10!="" {print $2}' Data/juegos.csv | sort -u | wc -l)"
+
+      - name: Guardar el REPO actualizado
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ScraperJuegos/Data/juegos.csv ScraperJuegos/docs/hltb_autocompletar.csv
+          if git diff --cached --quiet; then echo "Sin cambios."; exit 0; fi
+          git commit -m "REPO: hltb_id completados automáticamente (Wikidata)"
+          for i in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push && exit 0
+            sleep 5
+          done
+          echo "::error::No se pudo guardar el REPO"; exit 1
