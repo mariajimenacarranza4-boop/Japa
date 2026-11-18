@@ -32,7 +32,7 @@ concurrency:
 jobs:
   scraping:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180   # una corrida real tarda ~105 min (Eneba va de 1 en 1 con 3 s de pausa); margen antes del corte
     steps:
       - uses: actions/checkout@v4
 
@@ -80,6 +80,8 @@ jobs:
           # Si el comando falla, igual se intenta publicar lo que haya: publicar_catalogo.py decide si es válido.
           ( cd A_Orquestador && eval "$COMANDO" ) 2>&1 | tee "$SALIDA/consola_scraping.txt" || true
           echo "DURACION=$(( $(date +%s) - INICIO ))" >> "$GITHUB_ENV"
+          # Quita precios sospechosos de Eneba que hayan quedado guardados de corridas anteriores (comando de A).
+          if [ -f datos/catalogo_a.json ]; then ( cd A_Orquestador && dotnet run -c Release --no-build -- limpiar ../datos/catalogo_a.json ) || echo "::warning::No se pudo limpiar el catálogo"; fi
           echo "NUEVO=datos/catalogo_a.json" >> "$GITHUB_ENV"
           # Logs de A y B como evidencia (se suben como artefacto más abajo).
           cp A_Orquestador/log_fallos.txt "$SALIDA/" 2>/dev/null || true
