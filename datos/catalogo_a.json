@@ -291,7 +291,7 @@
     "mejor_precio": 4.74,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 59.99,
-    "descuento_pct": 92.10,
+    "descuento_pct": 92.1,
     "en_oferta": true,
     "metacritic": {
       "score": 84,
@@ -1092,7 +1092,7 @@
     "mejor_precio": 25.18,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 77,
-    "descuento_pct": 67.30,
+    "descuento_pct": 67.3,
     "en_oferta": true,
     "metacritic": {
       "score": 93,
@@ -1480,7 +1480,7 @@
     "mejor_precio": 11.95,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 49.99,
-    "descuento_pct": 76.10,
+    "descuento_pct": 76.1,
     "en_oferta": true,
     "metacritic": {
       "score": 92,
@@ -1798,7 +1798,7 @@
     "mejor_precio": 54.65,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 59.99,
-    "descuento_pct": 8.90,
+    "descuento_pct": 8.9,
     "en_oferta": true,
     "metacritic": {
       "score": 89,
@@ -1870,7 +1870,7 @@
     "mejor_precio": 10.47,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 77,
-    "descuento_pct": 86.40,
+    "descuento_pct": 86.4,
     "en_oferta": true,
     "metacritic": {
       "score": 90,
@@ -5825,7 +5825,7 @@
     ],
     "mejor_precio": 1.4,
     "mejor_tienda": "Eneba",
-    "descuento_pct": 96.50,
+    "descuento_pct": 96.5,
     "en_oferta": true,
     "metacritic": {
       "score": 87,
@@ -6717,7 +6717,7 @@
     "mejor_precio": 6.04,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 39.99,
-    "descuento_pct": 84.90,
+    "descuento_pct": 84.9,
     "en_oferta": true,
     "metacritic": {
       "score": 75,
@@ -7251,7 +7251,7 @@
     "mejor_precio": 7.96,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 14.99,
-    "descuento_pct": 46.90,
+    "descuento_pct": 46.9,
     "en_oferta": true,
     "metacritic": {
       "score": 90,
@@ -9898,7 +9898,7 @@
     "mejor_precio": 5.4,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 39.99,
-    "descuento_pct": 86.50,
+    "descuento_pct": 86.5,
     "en_oferta": true,
     "metacritic": {
       "score": 79,
@@ -10132,7 +10132,7 @@
     "mejor_precio": 13.14,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 59.99,
-    "descuento_pct": 78.10,
+    "descuento_pct": 78.1,
     "en_oferta": true,
     "metacritic": {
       "score": 87,
@@ -12642,7 +12642,7 @@
       "PC"
     ],
     "fecha_lanzamiento": "2020-08-14T00:00:00",
-    "precio_sugerido": 35.00,
+    "precio_sugerido": 35.0,
     "tiendas": [
       {
         "ok": true,
@@ -12732,7 +12732,7 @@
     "mejor_precio": 22.78,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 34.99,
-    "descuento_pct": 34.90,
+    "descuento_pct": 34.9,
     "en_oferta": true,
     "metacritic": {
       "score": 87,
@@ -14615,58 +14615,6 @@
     }
   },
   {
-    "id": "553",
-    "nombre": "Guilty Gear -Strive-",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1384160/23a7b8f8c96b47ab7ef5f22f33b572a63aaf9fab/header.jpg?t=1788400087",
-    "plataformas": [
-      "PS4",
-      "PS5",
-      "PC",
-      "Xbox Series"
-    ],
-    "fecha_lanzamiento": "2021-06-11T00:00:00",
-    "precio_sugerido": 59.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 39.99,
-        "precio_regular": 39.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/1384160/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1384160/23a7b8f8c96b47ab7ef5f22f33b572a63aaf9fab/header.jpg?t=1788400087",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:25:03.1616258+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 13.86,
-        "precio_regular": 39.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-guilty-gear-strive-steam-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/Bi8DfQwLkwnbcQV2fE-3z7hGa65TL8LJ4hnsN5dm-tY/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9L/bkxSdFZ5OE1nb2Rn/RTMtaHVacXRwSHk4/UVRka1gzSHdxNTZl/SG5UM2xjLmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:27:23.5511159+00:00"
-      }
-    ],
-    "mejor_precio": 13.86,
-    "mejor_tienda": "Eneba",
-    "precio_regular_mejor": 39.99,
-    "descuento_pct": 65.34,
-    "en_oferta": true,
-    "metacritic_por_plataforma": [],
-    "ultima_actualizacion": "2026-11-18T02:27:32.0900293+00:00",
-    "estado_fuentes": {
-      "Eneba": "ok",
-      "Steam": "ok",
-      "metacritic": "fallo",
-      "hltb": "fallo"
-    }
-  },
-  {
     "id": "557",
     "nombre": "Battlefield 2042",
     "imagen_url": "https://imgproxy.eneba.games/_wOVoj1fs6h5fIO5XD0IzTZV91343WzBgxUYXG9BNLI/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9N/ekJNTjlCQkNmUjNi/dThHNzhJOW5XSmp5/a291N1pvT1VieUw4/bHVucTdvLnBuZw",
@@ -15138,7 +15086,7 @@
     "mejor_precio": 5.7,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 49.99,
-    "descuento_pct": 88.60,
+    "descuento_pct": 88.6,
     "en_oferta": true,
     "metacritic": {
       "score": 80,
@@ -17021,7 +16969,7 @@
     "mejor_precio": 2.75,
     "mejor_tienda": "Eneba",
     "precio_regular_mejor": 24.99,
-    "descuento_pct": 89.00,
+    "descuento_pct": 89.0,
     "en_oferta": true,
     "metacritic": {
       "score": 89,
@@ -17045,802 +16993,6 @@
       "Steam": "ok",
       "Eneba": "ok",
       "Nintendo eShop": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "661",
-    "nombre": "Inscryption",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1092790/header.jpg?t=1777572925",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2021-10-19T00:00:00",
-    "precio_sugerido": 19.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 19.99,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/1092790/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1092790/header.jpg?t=1777572925",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:42:12.988751+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 7.66,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-inscryption-pc-steam-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/BOhMVa2IetmPZF-hhhdXiPqo5aQZRRlW1jEPyPUZocM/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9y/RUdHRWtjYTZ6aHJk/Y0ZTS2ZVckwtbV9C/QWlUbC1yRm82UDVm/WkMyejAwLmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:22.1338225+00:00"
-      }
-    ],
-    "mejor_precio": 7.66,
-    "mejor_tienda": "Eneba",
-    "precio_regular_mejor": 19.99,
-    "descuento_pct": 61.68,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 85,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:42:13.5164938+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 85,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:42:13.5164938+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:44:22.1338888+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "662",
-    "nombre": "Dredge",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1562430/header.jpg?t=1793158823",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2023-03-30T00:00:00",
-    "precio_sugerido": 24.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 19.99,
-        "precio_regular": 39.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/1562430/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1562430/header.jpg?t=1793158823",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:42:53.2498204+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 5.69,
-        "precio_regular": 39.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-dredge-pc-steam-key-latam",
-        "imagen_url": "https://imgproxy.eneba.games/JsSA0Yic_sLRBzsBT90jk_A4WWQsobDKxM9pfzHOIys/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9C/UzJuX0ZyelZ4QW14/a1J0aG96aERJUTRl/ZU0wanJ6ai16UDJP/ekFzVk00LmpwZw",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:32.1241905+00:00"
-      }
-    ],
-    "mejor_precio": 5.69,
-    "mejor_tienda": "Eneba",
-    "precio_regular_mejor": 39.99,
-    "descuento_pct": 85.77,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 80,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:42:52.4065891+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 80,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:42:52.4065891+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:44:32.124259+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "663",
-    "nombre": "Spiritfarer",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/972660/header.jpg?t=1752503178",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2020-08-18T00:00:00",
-    "precio_sugerido": 29.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 29.99,
-        "precio_regular": 29.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/972660/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/972660/header.jpg?t=1752503178",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:43:52.2192398+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 2.9,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-spiritfarer-steam-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/EuzbdAETom7uU5GmcR1pksHRHOFVVgVz7DS4K8p0hvg/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9Z/MW5RVlg1Z1UyX2V2/VjVsQ1RYQW5FcFdS/Q0NZLURVZWNxcEtl/X2ZINFlBLmpwZw",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:42.1057727+00:00"
-      }
-    ],
-    "mejor_precio": 2.9,
-    "mejor_tienda": "Eneba",
-    "descuento_pct": 90.33,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 84,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:43:52.7794525+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 84,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:43:52.7794525+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:44:42.1058363+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "664",
-    "nombre": "Unpacking",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1135690/header.jpg?t=1789426289",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2021-11-02T00:00:00",
-    "precio_sugerido": 19.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 19.99,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/1135690/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1135690/header.jpg?t=1789426289",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:13.2371921+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 8.21,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-unpacking-pc-steam-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/R8PXz_IW_e9X-KJPJtGppF6xROWW8ZczgWVPTFiOyH0/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9z/UExtTVF3MTV1NzBy/SmQxTDJPU3BJd0J5/TjNVM0VCdnZxMTdY/Z1BuUjcwLmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:52.1265332+00:00"
-      }
-    ],
-    "mejor_precio": 8.21,
-    "mejor_tienda": "Eneba",
-    "precio_regular_mejor": 19.99,
-    "descuento_pct": 58.93,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 83,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:44:12.8699966+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 83,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:44:12.8699966+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:44:52.1266013+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "665",
-    "nombre": "Animal Well",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/813230/header.jpg?t=1788379439",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2024-05-09T00:00:00",
-    "precio_sugerido": 24.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 24.99,
-        "precio_regular": 24.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/813230/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/813230/header.jpg?t=1788379439",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:23.2742463+00:00"
-      }
-    ],
-    "mejor_precio": 24.99,
-    "mejor_tienda": "Steam",
-    "precio_regular_mejor": 24.99,
-    "descuento_pct": 0,
-    "en_oferta": false,
-    "metacritic": {
-      "score": 90,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:44:22.6216805+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 90,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:44:22.6216805+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:45:02.0965454+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "fallo",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "666",
-    "nombre": "Dead by Daylight",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/header.jpg?t=1793724618",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2016-06-14T00:00:00",
-    "precio_sugerido": 19.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 19.99,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/381210/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/header.jpg?t=1793724618",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:33.2565016+00:00"
-      }
-    ],
-    "mejor_precio": 19.99,
-    "mejor_tienda": "Steam",
-    "precio_regular_mejor": 19.99,
-    "descuento_pct": 0,
-    "en_oferta": false,
-    "metacritic": {
-      "score": 64,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:44:33.2168464+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 64,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:44:33.2168464+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:45:12.1031299+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "fallo",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "667",
-    "nombre": "The Binding of Isaac: Rebirth",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/250900/header.jpg?t=1731977365",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2014-11-04T00:00:00",
-    "precio_sugerido": 14.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 11.99,
-        "precio_regular": 14.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/250900/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/250900/header.jpg?t=1731977365",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:43.1993941+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 17.58,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/gog-the-binding-of-isaac-rebirth-pc-gog-com-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/60NtgDjS69Y91kpxL1wNbF9g1jyrTlRewgz0QHHcQFw/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy8x/WUpYOW8zRVpRdjY0/TzljbFA1d3dfc0df/WFBKUXZkVXVvcjlj/NXhTaWtBLmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:22.1460643+00:00"
-      }
-    ],
-    "mejor_precio": 11.99,
-    "mejor_tienda": "Steam",
-    "precio_regular_mejor": 14.99,
-    "descuento_pct": 20.01,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 88,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:44:42.6951095+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 88,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:44:42.6951095+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:45:22.1461445+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "668",
-    "nombre": "Hotline Miami",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/219150/header.jpg?t=1785434922",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2012-10-23T00:00:00",
-    "precio_sugerido": 9.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 9.99,
-        "precio_regular": 9.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/219150/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/219150/header.jpg?t=1785434922",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:44:53.2479741+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 2.52,
-        "precio_regular": 9.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-hotline-miami-steam-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/J6mUFP9XnCJXWF4MylLehFMdYoPSu6Y3s7UL5sqM5aA/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9r/LVdNWFFlZHc1bEtZ/ZjFWODYyajdrUzJX/OUg1dTh6QzhlaDZG/ZW1EZUVJLmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:32.0902916+00:00"
-      }
-    ],
-    "mejor_precio": 2.52,
-    "mejor_tienda": "Eneba",
-    "precio_regular_mejor": 9.99,
-    "descuento_pct": 74.77,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 85,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:44:53.4018161+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 85,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:44:53.4018161+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:45:32.0903474+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "669",
-    "nombre": "Titanfall 2",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/header.jpg?t=1779987598",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2016-10-28T00:00:00",
-    "precio_sugerido": 29.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 29.99,
-        "precio_regular": 29.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/1237970/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/header.jpg?t=1779987598",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:03.1964912+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 3.86,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/origin-titanfall-2-en-fr-es-mx-br-pc-origin-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/K1tasyy29roqVpGjWLP_0-VBFVyQc6HOzNpOK-BEkxQ/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9m/aGJlaWxuZ2h5aGht/anFoaW5xYS5qcGc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:42.1196279+00:00"
-      }
-    ],
-    "mejor_precio": 3.86,
-    "mejor_tienda": "Eneba",
-    "descuento_pct": 87.13,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 89,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:45:02.5707201+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 89,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:45:02.5707201+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:45:42.1196928+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "670",
-    "nombre": "Prey",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/480490/9ed715575a2205350e937e5e6d25b3e8a494605e/header.jpg?t=1784141088",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2017-05-05T00:00:00",
-    "precio_sugerido": 29.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 29.99,
-        "precio_regular": 29.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/480490/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/480490/9ed715575a2205350e937e5e6d25b3e8a494605e/header.jpg?t=1784141088",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:13.3759399+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 3.45,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-prey-digital-deluxe-edition-steam-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/8xdW686qoaXOh2gSrINCWomcbTEMoGDdC2E8OznkypM/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy8y/NFhqb1U2ZUctdExq/cDM2U1kxbHg2b0xa/aXYwc2djWE8zdmZO/a0tpR2k0LmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:52.1582288+00:00"
-      }
-    ],
-    "mejor_precio": 3.45,
-    "mejor_tienda": "Eneba",
-    "descuento_pct": 88.50,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 79,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:45:12.7564342+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 79,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:45:12.7564342+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:45:52.1582966+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "671",
-    "nombre": "Limbo",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/48000/header.jpg?t=1761819450",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2011-08-02T00:00:00",
-    "precio_sugerido": 9.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 12.49,
-        "precio_regular": 12.49,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/48000/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/48000/header.jpg?t=1761819450",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:23.2298629+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 5.38,
-        "precio_regular": 12.49,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-limbo-steam-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/FtV8HrwJj7V2WwqJbnQe3AS0Ym8cpJ0Np3_B793tmbQ/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9H/SXJxTmptYkxGSzhv/N3N2MFItNUE2N2wz/b2JEaUVnMVF2bjRH/YmFqaXowLmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:46:02.0956559+00:00"
-      }
-    ],
-    "mejor_precio": 5.38,
-    "mejor_tienda": "Eneba",
-    "precio_regular_mejor": 12.49,
-    "descuento_pct": 56.93,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 90,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:45:22.4759401+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 90,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:45:22.4759401+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:46:02.0957189+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "672",
-    "nombre": "Pizza Tower",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2231450/header.jpg?t=1732516978",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2023-01-26T00:00:00",
-    "precio_sugerido": 19.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 19.99,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/2231450/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2231450/header.jpg?t=1732516978",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:33.2580749+00:00"
-      }
-    ],
-    "mejor_precio": 19.99,
-    "mejor_tienda": "Steam",
-    "precio_regular_mejor": 19.99,
-    "descuento_pct": 0,
-    "en_oferta": false,
-    "metacritic": {
-      "score": 89,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:45:32.7731856+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 89,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:45:32.7731856+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:46:12.1061817+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "fallo",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "673",
-    "nombre": "Slime Rancher",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/433340/header.jpg?t=1758651509",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2017-08-01T00:00:00",
-    "precio_sugerido": 19.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 19.99,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/433340/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/433340/header.jpg?t=1758651509",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:43.2304168+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 4.6,
-        "precio_regular": 19.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/steam-slime-rancher-pc-steam-key-latam",
-        "imagen_url": "https://imgproxy.eneba.games/cARmXFuqlLRku40WniIuOWoorEEMcWXEhKKpYPibH4E/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9X/TzFrUnNuRHBCcXdT/cjZXcGI0a3FhUC1V/cmNlTGN6bmVRdHh3/YWNONS1vLmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:46:21.9195538+00:00"
-      }
-    ],
-    "mejor_precio": 4.6,
-    "mejor_tienda": "Eneba",
-    "precio_regular_mejor": 19.99,
-    "descuento_pct": 76.99,
-    "en_oferta": true,
-    "metacritic": {
-      "score": 81,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:45:42.7607808+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 81,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:45:42.7607808+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:46:21.9196179+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
-      "metacritic": "ok",
-      "hltb": "fallo"
-    }
-  },
-  {
-    "id": "674",
-    "nombre": "Papers, Please",
-    "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/239030/header.jpg?t=1678266428",
-    "plataformas": [
-      "PC"
-    ],
-    "fecha_lanzamiento": "2013-08-08T00:00:00",
-    "precio_sugerido": 9.99,
-    "tiendas": [
-      {
-        "ok": true,
-        "tienda": "Steam",
-        "precio_actual": 9.99,
-        "precio_regular": 9.99,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://store.steampowered.com/app/239030/",
-        "imagen_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/239030/header.jpg?t=1678266428",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:45:53.2443371+00:00"
-      },
-      {
-        "ok": true,
-        "tienda": "Eneba",
-        "precio_actual": 10.52,
-        "formato": "digital",
-        "plataforma": "PC",
-        "enlace": "https://www.eneba.com/gog-papers-please-gog-com-key-global",
-        "imagen_url": "https://imgproxy.eneba.games/UlOdVdZzzjzBl0DmbVUGMAfJndLH7iMWpHEz72lZ1Ss/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9q/dzIybm1EYVEwaW9K/dDZkZzB4d0xhUi1Q/dWRmcmtuVG0ydWZD/OU1mUkE4LmpwZWc",
-        "moneda": "USD",
-        "fecha_consulta": "2026-11-18T02:46:32.0443782+00:00"
-      }
-    ],
-    "mejor_precio": 9.99,
-    "mejor_tienda": "Steam",
-    "precio_regular_mejor": 9.99,
-    "descuento_pct": 0,
-    "en_oferta": false,
-    "metacritic": {
-      "score": 85,
-      "plataforma": "PC",
-      "fecha": "2026-11-18T02:45:52.4297976+00:00"
-    },
-    "metacritic_por_plataforma": [
-      {
-        "score": 85,
-        "plataforma": "PC",
-        "fecha": "2026-11-18T02:45:52.4297976+00:00"
-      }
-    ],
-    "ultima_actualizacion": "2026-11-18T02:46:32.0444471+00:00",
-    "estado_fuentes": {
-      "Steam": "ok",
-      "Eneba": "ok",
       "metacritic": "ok",
       "hltb": "fallo"
     }
