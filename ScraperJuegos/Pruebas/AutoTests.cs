@@ -24,11 +24,8 @@ public static class AutoTests
     private static readonly ConfigScraping CfgRapida = new()
     {
         Timeout = TimeSpan.FromSeconds(2), MaxReintentos = 2,
-        EsperaBase = TimeSpan.FromMilliseconds(5), UserAgent = "ScraperJuegosTEC/test",
-        // Las pruebas no deben depender de variables de entorno de quien las corra.
-        ItadApiKey = null, ItadEpicShopId = null, CheapSharkEpicStoreId = null
+        EsperaBase = TimeSpan.FromMilliseconds(5), UserAgent = "ScraperJuegosTEC/test"
     };
-    private static readonly ConfigScraping CfgItad = CfgRapida with { ItadApiKey = "clave-de-prueba" };
 
     private static (ClienteHttp cli, ManejadorFalso mf, LogFallosArchivo log) Montar(
         Func<HttpRequestMessage, int, HttpResponseMessage> f, ConfigScraping? cfg = null, string? rutaLog = null)
@@ -39,13 +36,6 @@ public static class AutoTests
         var cli = new ClienteHttp(new HttpClient(mf), cfg ?? CfgRapida, new LimitadorDominio(4, TimeSpan.Zero), log);
         return (cli, mf, log);
     }
-
-    /// <summary>Solicitudes hechas a la API (sin contar las de robots.txt, que el cliente hace aparte).</summary>
-    private static List<string> Api(ManejadorFalso mf) { lock (mf.Urls) return mf.Urls.Where(u => !u.EndsWith("/robots.txt")).ToList(); }
-
-    /// <summary>Servidor falso de CheapShark: /stores devuelve la lista de tiendas y /deals lo que se indique.</summary>
-    private static HttpResponseMessage CheapShark(HttpRequestMessage r, string deals, string? tiendas = null) =>
-        ManejadorFalso.Json(r.RequestUri!.AbsolutePath.EndsWith("/stores") ? (tiendas ?? Fixtures.CheapSharkTiendas()) : deals);
 
     private static Juego J(string nombre, string plat, decimal sug = 59.99m, int anio = 2022, string? appid = null, string? hltb = null) =>
         new(1, nombre, plat, new DateTime(anio, 1, 1), sug, SteamAppId: appid, HltbId: hltb);
@@ -264,249 +254,155 @@ public static class AutoTests
                       "robots.txt de HLTB: /api bloqueado, /game/68151 permitido");
         }
 
-        Console.WriteLine("== Epic Games Store (vía CheapShark) ==");
+        Console.WriteLine("== Epic Games Store ==");
         {
-            var (cli, mf, _) = Montar((r, n) => CheapShark(r, Fixtures.CheapSharkOfertas(
-                Fixtures.CheapSharkOferta("ELDEN RING Soundtrack", "9.99", "9.99", dealId: "SONIDO"),
-                Fixtures.CheapSharkOferta("ELDEN RING", "35.99", "59.99"))));
+            var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.EpicRespuesta("ELDEN RING", 3599, 5999)));
             var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
             Verificar(r.Ok && r.PrecioActual == 35.99m && r.PrecioRegular == 59.99m && r.Formato == "digital" && r.Plataforma == "PC"
-                      && r.Enlace == "https://www.cheapshark.com/redirect?dealID=AbC%2Bxyz%3D" && r.ImagenUrl == "https://img/epic.png",
-                      "éxito: precios (texto decimal), formato, plataforma, enlace /redirect de CheapShark (dealID sin codificar dos veces), imagen", Serializacion.AJson(r));
-            Verificar(Api(mf).Count == 2 && Api(mf).All(u => u.StartsWith("GET https://www.cheapshark.com/api/1.0/")), "2 solicitudes GET a la API de CheapShark (tiendas + ofertas); nada se pide a store.epicgames.com");
-            Verificar(Api(mf).Any(u => u.Contains("/deals?storeID=25&title=Elden Ring")), "el id de Epic sale de /stores (no está escrito a mano) y el título viaja codificado");
+                      && r.Enlace == "https://store.epicgames.com/en-US/p/elden-ring" && r.ImagenUrl == "https://img/epic.png",
+                      "éxito: precios (enteros en centavos), formato, plataforma, enlace, imagen", Serializacion.AJson(r));
+            Verificar(mf.Urls.Count(u => u.StartsWith("POST") && u.Contains("/graphql")) == 1, "1 sola solicitud (POST /graphql) por juego");
             var r2 = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PS5")).Result;
             Verificar(!r2.Ok && r2.Error == TipoError.NoEncontrado, "plataforma no soportada -> no_encontrado");
         }
         {
-            var (cli, mf, _) = Montar((r, n) => CheapShark(r, Fixtures.CheapSharkOfertas(Fixtures.CheapSharkOferta("ELDEN RING", "35.99", "59.99"))));
-            var epic = new EpicGamesScraper(cli);
-            var a = epic.ConsultarAsync(J("Elden Ring", "PC")).Result;
-            var b = epic.ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(a.Ok && b.Ok && Api(mf).Count(u => u.Contains("/stores")) == 1 && Api(mf).Count(u => u.Contains("/deals")) == 2,
-                      "la lista de tiendas se pide UNA sola vez por corrida (menos carga para CheapShark)", string.Join(" | ", mf.Urls));
-        }
-        {
-            var (cli, mf, _) = Montar((r, n) => CheapShark(r, Fixtures.CheapSharkOfertas(Fixtures.CheapSharkOferta("ELDEN RING", "35.99", "59.99"))),
-                                      CfgRapida with { CheapSharkEpicStoreId = "28" });
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.EpicRespuesta("ELDEN RING", 3599, 5999, moneda: "EUR")));
             var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.NoEncontrado && Api(mf).All(u => !u.Contains("/stores")) && Api(mf).Any(u => u.Contains("storeID=28")),
-                      "CHEAPSHARK_EPIC_STORE_ID fija el id y omite /stores (las ofertas de otra tienda se ignoran)", string.Join(" | ", mf.Urls));
+            Verificar(!r.Ok && r.Error == TipoError.FormatoCambiado, "precios en otra moneda -> formato_cambiado (no se mezclan monedas)");
         }
         {
-            var (cli, _, _) = Montar((r, n) => CheapShark(r, Fixtures.CheapSharkOfertas(
-                Fixtures.CheapSharkOferta("ELDEN RING", "5.00", "9.00", storeId: "1"),               // otra tienda: se ignora
-                Fixtures.CheapSharkOferta("ELDEN RING Deluxe Edition", "49.99", "79.99"),
-                Fixtures.CheapSharkOferta("Elden Ring", "35.99", "59.99"))));
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(r.Ok && r.PrecioActual == 35.99m && r.PrecioRegular == 59.99m, "ediciones: elige la de menor precio regular e ignora ofertas de otras tiendas", Serializacion.AJson(r));
-        }
-        {
-            var (cli, _, _) = Montar((r, n) => CheapShark(r, Fixtures.CheapSharkOfertas(Fixtures.CheapSharkOferta("ELDEN RING", "35.99", "59.99"))));
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.EpicRespuesta("ELDEN RING", 3599, 5999)));
             var r = new EpicGamesScraper(cli).ConsultarAsync(J("Doom", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.NoEncontrado, "juego que no está en los resultados -> no_encontrado (\"Doom\" no es \"Elden Ring\")");
+            Verificar(!r.Ok && r.Error == TipoError.NoEncontrado, "juego que no está en los resultados -> no_encontrado");
         }
         {
-            // Respaldo por steam_appid: el título de Epic difiere, pero el identificador de Steam coincide.
-            var (cli, mf, _) = Montar((r, n) => CheapShark(r, r.RequestUri!.Query.Contains("steamAppID=1245620")
-                ? Fixtures.CheapSharkOfertas(Fixtures.CheapSharkOferta("Elden Ring: Edicion Rara", "35.99", "59.99", steamAppId: "1245620"))
-                : "[]"));
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC", appid: "1245620")).Result;
-            Verificar(r.Ok && r.PrecioActual == 35.99m && Api(mf).Count == 3, "sin coincidencia por título, reintenta por steam_appid (3 solicitudes como máximo)", string.Join(" | ", mf.Urls));
-            var (cli2, mf2, _) = Montar((r, n) => CheapShark(r, "[]"));
-            var r2 = new EpicGamesScraper(cli2).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r2.Ok && r2.Error == TipoError.NoEncontrado && Api(mf2).Count == 2, "sin steam_appid no hay segunda consulta -> no_encontrado");
-        }
-        {
-            var (cli, _, _) = Montar((r, n) => CheapShark(r, Fixtures.CheapSharkOfertas(Fixtures.CheapSharkOferta("ELDEN RING", "0.00", "0.00"))));
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json("{\"errors\":[{\"message\":\"boom\"}]}"));
             var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.NoEncontrado, "producto gratuito (precio regular 0) -> no_encontrado");
+            Verificar(!r.Ok && r.Error == TipoError.FormatoCambiado && r.Detalle!.Contains("boom"), "GraphQL con 'errors' -> formato_cambiado con el motivo");
         }
         {
-            var (cli, _, _) = Montar((r, n) => CheapShark(r, "[]", Fixtures.CheapSharkTiendas(epicActiva: false)));
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no"));
             var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.FormatoCambiado && r.Detalle!.Contains("inactiva"), "CheapShark marca a Epic como inactiva -> formato_cambiado con el motivo");
-            var (cli2, _, _) = Montar((r, n) => CheapShark(r, "[]", "[{\"storeID\":\"1\",\"storeName\":\"Steam\",\"isActive\":1}]"));
-            var r2 = new EpicGamesScraper(cli2).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r2.Ok && r2.Error == TipoError.FormatoCambiado && r2.Detalle!.Contains("ya no lista"), "CheapShark ya no lista a Epic -> formato_cambiado con el motivo");
-        }
-        {
-            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json("{\"error\":\"boom\"}"));
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.FormatoCambiado, "respuesta que no es una lista -> formato_cambiado");
-            var (cli2, _, _) = Montar((r, n) => ManejadorFalso.Html("<html>no es json</html>"));
-            var r2 = new EpicGamesScraper(cli2).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r2.Ok && r2.Error == TipoError.FormatoCambiado, "respuesta que no es JSON -> formato_cambiado");
-        }
-        {
-            // 403 / robots: bloqueo, y el disyuntor evita insistir con los demás juegos.
-            var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no"));
-            var epic = new EpicGamesScraper(cli);
-            var r = epic.ConsultarAsync(J("Elden Ring", "PC")).Result;
-            int tras1 = Api(mf).Count;
-            var r2 = epic.ConsultarAsync(J("Hades", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.Bloqueo && tras1 == 1, "403 de CheapShark -> bloqueo, sin reintentos");
-            Verificar(!r2.Ok && r2.Error == TipoError.Bloqueo && Api(mf).Count == tras1, "disyuntor: tras un bloqueo no se vuelve a pedir nada a CheapShark (Epic queda sin precios, sin romper nada)");
-        }
-        {
-            // Si el robots.txt de CheapShark no permitiera /api: el scraper lo marca como bloqueo y NO hace la solicitud.
-            var mf = new ManejadorFalso((r, n) => r.RequestUri!.AbsolutePath == "/robots.txt"
-                ? ManejadorFalso.Texto(HttpStatusCode.OK, "User-agent: *\nDisallow: /api\n")
-                : ManejadorFalso.Json(Fixtures.CheapSharkTiendas()));
-            var cli = new ClienteHttp(new HttpClient(mf), CfgRapida, new LimitadorDominio(4, TimeSpan.Zero), new LogFallosArchivo(null));
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.Bloqueo && mf.Urls.All(u => u.EndsWith("/robots.txt")),
-                      "robots.txt de CheapShark prohíbe /api -> bloqueo y ninguna solicitud a /api", string.Join(" | ", mf.Urls));
+            Verificar(!r.Ok && r.Error == TipoError.Bloqueo, "403 -> bloqueo");
         }
 
-        Console.WriteLine("== Epic Games Store: respaldo con IsThereAnyDeal ==");
+        Console.WriteLine("== Steam y nombres (correcciones con datos reales) ==");
         {
-            // CheapShark bloquea (403) -> Epic se consulta por ITAD (clave en cabecera, nunca en la URL).
-            string? claveVista = null, cuerpoPrecios = null;
-            var (cli, mf, _) = Montar((r, n) =>
+            // Datos reales: la versión original de Ori ya no se vende; la Definitive Edition sí. Antes se rendía en la primera.
+            const string busqueda = "{\"total\":2,\"items\":[" +
+                "{\"type\":\"app\",\"name\":\"Ori and the Blind Forest\",\"id\":261570,\"platforms\":{\"windows\":true}}," +
+                "{\"type\":\"app\",\"name\":\"Ori and the Blind Forest: Definitive Edition\",\"id\":387290,\"price\":{\"currency\":\"USD\",\"initial\":1999,\"final\":499},\"platforms\":{\"windows\":true}}]}";
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json(busqueda));
+            var r = new SteamScraper(cli).ConsultarAsync(J("Ori and the Blind Forest", "PC")).Result;
+            Verificar(r.Ok && r.PrecioActual == 4.99m && r.Enlace!.Contains("387290"),
+                      "Steam: si la primera coincidencia no tiene precio (retirada), usa la siguiente que sí se vende", Serializacion.AJson(r));
+            var (cli2, _, _) = Montar((r2, n) => ManejadorFalso.Json("{\"total\":1,\"items\":[{\"type\":\"app\",\"name\":\"Halo Infinite\",\"id\":1240440,\"platforms\":{\"windows\":true}}]}"));
+            var r3 = new SteamScraper(cli2).ConsultarAsync(J("Halo Infinite", "PC")).Result;
+            Verificar(!r3.Ok && r3.Error == TipoError.NoEncontrado && r3.Detalle!.Contains("sin precio"), "Steam: juego gratis (sin precio) -> no_encontrado con el motivo");
+        }
+        {
+            JsonElement H(string json) { using var d = JsonDocument.Parse(json); return d.RootElement.Clone(); }
+            Verificar(SteamScraper.ImagenDeBusqueda(H("{\"tiny_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2933620/abc123/capsule_231x87.jpg?t=17\"}"))
+                          == "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2933620/abc123/header.jpg?t=17"
+                      && SteamScraper.ImagenDeBusqueda(H("{}")) == null,
+                      "Steam: la imagen sale de la ruta real de la búsqueda (juegos nuevos con código en la ruta)");
+        }
+        Verificar(SteamScraper.EsEdicionDe(J("Disco Elysium", "PC"), "Disco Elysium - The Final Cut")
+                  && SteamScraper.EsEdicionDe(J("Spiritfarer", "PC"), "Spiritfarer®: Farewell Edition")
+                  && !SteamScraper.EsEdicionDe(J("Hades", "PC"), "Hollow Knight"),
+                  "Steam por appid: acepta edición/subtítulo agregado, rechaza otro juego");
+        {
+            int n = 0;
+            var (cli, mf, _) = Montar((r, k) =>
             {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no");
-                if (r.Headers.TryGetValues("ITAD-API-Key", out var v)) claveVista = v.First();
-                string ruta = r.RequestUri.AbsolutePath;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup());
-                if (ruta.EndsWith("/games/prices/v3")) { cuerpoPrecios = r.Content!.ReadAsStringAsync().Result; return ManejadorFalso.Json(Fixtures.ItadPrecios("35.99", "59.99")); }
-                return ManejadorFalso.Texto(HttpStatusCode.NotFound, "x");
-            }, CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(r.Ok && r.PrecioActual == 35.99m && r.PrecioRegular == 59.99m && r.Formato == "digital" && r.Plataforma == "PC"
-                      && r.Enlace == "https://isthereanydeal.com/redirect/epic-elden-ring", "CheapShark bloqueado + clave ITAD -> precios de Epic vía ITAD", Serializacion.AJson(r));
-            Verificar(claveVista == "clave-de-prueba" && Api(mf).All(u => !u.Contains("clave-de-prueba")), "la clave viaja en la cabecera ITAD-API-Key y NO aparece en ninguna URL");
-            Verificar(cuerpoPrecios == "[\"" + Fixtures.ItadGameId + "\"]" && Api(mf).Any(u => u.StartsWith("POST https://api.isthereanydeal.com/games/prices/v3?country=US&shops=16")),
-                      "precios: POST /games/prices/v3 con el id del juego y el id de Epic (16, hallado por nombre) en USD", string.Join(" | ", Api(mf)));
+                n++;
+                return r.RequestUri!.AbsolutePath.Contains("appdetails")
+                    ? ManejadorFalso.Json("{\"2933620\":{\"success\":true,\"data\":{\"header_image\":\"https://img/real/header.jpg?t=1\"}}}")
+                    : ManejadorFalso.Json("{\"total\":1,\"items\":[{\"type\":\"app\",\"name\":\"Call of Duty: Black Ops 6\",\"id\":2933620," +
+                        "\"price\":{\"currency\":\"USD\",\"initial\":6999,\"final\":6999},\"tiny_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2933620/aaa/capsule_231x87.jpg\",\"platforms\":{\"windows\":true}}]}");
+            });
+            var r = new SteamScraper(cli).ConsultarAsync(J("Call of Duty: Black Ops 6", "PC")).Result;
+            Verificar(r.Ok && r.ImagenUrl == "https://img/real/header.jpg?t=1" && mf.Urls.Any(u => u.Contains("filters=basic")),
+                      "Steam (juego nuevo): la imagen grande se pide a appdetails porque no se puede adivinar su ruta", r.ImagenUrl ?? "");
+        }
+        Verificar(NormalizadorNombres.Coincide("Cities: Skylines", "Cities: Skylines - Nintendo Switch Edition")
+                  && NormalizadorNombres.Coincide("Hades", "Hades Nintendo Switch")
+                  && !NormalizadorNombres.Coincide("Nintendo Switch Sports", "Sports"),
+                  "Nombres: se quita la etiqueta de consola de Nintendo al final del título");
+
+        {
+            // Ritmo adaptativo: 429 -> la pausa del dominio sube (2 s, luego 4 s) para todos los hilos.
+            var espia = new LimitadorEspia();
+            var mf = new ManejadorFalso((r, n) => r.RequestUri!.AbsolutePath == "/robots.txt"
+                ? ManejadorFalso.Texto(HttpStatusCode.OK, Fixtures.RobotsAbierto)
+                : (n <= 3 ? ManejadorFalso.Texto((HttpStatusCode)429, "lento") : ManejadorFalso.Json("{\"ok\":1}")));
+            var cfg = CfgRapida with { EsperaMaxima = TimeSpan.FromMilliseconds(20) };
+            var cli = new ClienteHttp(new HttpClient(mf), cfg, espia, new LogFallosArchivo(null));
+            var resp = cli.ObtenerAsync("https://www.eneba.com/x", new ContextoLog("J", "PC", "Eneba"), default).Result;
+            Verificar(resp.Codigo == 200 && espia.Pausas.Count >= 2 && espia.Pausas[0] == TimeSpan.FromSeconds(2) && espia.Pausas[1] == TimeSpan.FromSeconds(4)
+                      && espia.Pausas.All(p => p <= TimeSpan.FromSeconds(5)),
+                      "HTTP 429: baja el ritmo de ESE sitio (pausa 2 s, 4 s… máx. 5 s) y luego sigue", string.Join(",", espia.Pausas));
+        }
+
+        Console.WriteLine("== Epic Games Store vía CheapShark ==");
+        {
+            var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.CheapSharkDeals(
+                ("ELDEN RING Shadow of the Erdtree Edition", "59.99", "79.99", "25"),
+                ("ELDEN RING", "35.99", "59.99", "25"))));
+            var r = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
+            Verificar(r.Ok && r.Tienda == "Epic Games Store" && r.PrecioActual == 35.99m && r.PrecioRegular == 59.99m && r.Formato == "digital"
+                      && r.Plataforma == "PC" && r.Enlace == "https://www.cheapshark.com/redirect?dealID=abc1%3D" && r.ImagenUrl == "https://img/cs1.jpg",
+                      "éxito: precios en texto, edición base, enlace (redirect con dealID sin doble codificar) e imagen", Serializacion.AJson(r));
+            Verificar(mf.Urls.Count(u => u.Contains("/api/1.0/deals") && u.Contains("storeID=25") && u.Contains("exact=1")) == 1
+                      && mf.Urls.Count(u => u.Contains("/api/1.0/deals")) == 1,
+                      "1 sola solicitud (exact=1, storeID=25) cuando el título coincide", string.Join(" | ", mf.Urls));
+            var r2 = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Elden Ring", "Switch")).Result;
+            Verificar(!r2.Ok && r2.Error == TipoError.NoEncontrado, "plataforma no PC -> no_encontrado (sin solicitud)");
         }
         {
-            // Sin clave: no se hace ninguna solicitud a ITAD y el error dice qué configurar.
-            var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no"));
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.Bloqueo && r.Detalle!.Contains("ITAD_API_KEY") && Api(mf).All(u => !u.Contains("isthereanydeal")),
-                      "sin ITAD_API_KEY: ninguna solicitud a ITAD y el mensaje explica cómo activar el respaldo", r.Detalle);
+            // exact=1 no encuentra (CheapShark usa otro título) -> 2a solicitud con exact=0 y filtro por nombre
+            var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Json(r.RequestUri!.Query.Contains("exact=1")
+                ? "[]" : Fixtures.CheapSharkDeals(("Hades Soundtrack", "4.99", "9.99", "25"), ("Hades™", "12.49", "24.99", "25"))));
+            var r = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Hades", "PC")).Result;
+            Verificar(r.Ok && r.PrecioActual == 12.49m && r.PrecioRegular == 24.99m
+                      && mf.Urls.Count(u => u.Contains("exact=0")) == 1, "sin coincidencia exacta: búsqueda parcial (exact=0) y descarta la banda sonora", Serializacion.AJson(r));
         }
         {
-            // CheapShark no tiene el juego (no_encontrado) pero ITAD sí.
-            var (cli, _, _) = Montar((r, n) =>
-            {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return CheapShark(r, "[]");
-                string ruta = r.RequestUri.AbsolutePath;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup());
-                return ManejadorFalso.Json(Fixtures.ItadPrecios("19.99", "29.99", url: null));
-            }, CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(r.Ok && r.PrecioActual == 19.99m && r.Enlace == "https://isthereanydeal.com/game/elden-ring/info/",
-                      "CheapShark no encuentra el juego pero ITAD sí; sin url en la oferta usa la ficha del juego en ITAD", Serializacion.AJson(r));
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.CheapSharkDeals(("Elden Ring", "30.00", "59.99", "1"))));
+            var r = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
+            Verificar(!r.Ok && r.Error == TipoError.NoEncontrado, "oferta de OTRA tienda (storeID 1 = Steam) se ignora -> no_encontrado");
         }
         {
-            // CheapShark responde bien: ITAD no se toca.
-            var (cli, mf, _) = Montar((r, n) => CheapShark(r, Fixtures.CheapSharkOfertas(Fixtures.CheapSharkOferta("ELDEN RING", "35.99", "59.99"))), CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(r.Ok && mf.Urls.All(u => !u.Contains("isthereanydeal")), "si CheapShark funciona, ITAD no recibe ninguna solicitud");
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.CheapSharkDeals(("Fortnite", "0.00", "0.00", "25"))));
+            var r = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Fortnite", "PC")).Result;
+            Verificar(!r.Ok && r.Error == TipoError.NoEncontrado, "juego gratuito -> no_encontrado (no hay precio que comparar)");
         }
         {
-            // Lookup por steam_appid; si no, por título; si no, búsqueda aceptando solo coincidencias reales.
-            var (cli, mf, _) = Montar((r, n) =>
-            {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no");
-                string ruta = r.RequestUri.AbsolutePath, q = r.RequestUri.Query;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup(q.Contains("appid=1245620")));
-                return ManejadorFalso.Json(Fixtures.ItadPrecios("35.99", "59.99"));
-            }, CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC", appid: "1245620")).Result;
-            Verificar(r.Ok && Api(mf).Count(u => u.Contains("/games/lookup/v1")) == 1 && Api(mf).Any(u => u.Contains("appid=1245620")), "con steam_appid, el juego se identifica en ITAD por ese número (1 solicitud)");
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json("{\"error\":\"Unknown store\"}"));
+            var r = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
+            Verificar(!r.Ok && r.Error == TipoError.FormatoCambiado && r.Detalle!.Contains("Unknown store"), "respuesta que no es lista -> formato_cambiado con el motivo");
         }
         {
-            var (cli, _, _) = Montar((r, n) =>
-            {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no");
-                string ruta = r.RequestUri.AbsolutePath;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup(false));
-                if (ruta.EndsWith("/games/search/v1")) return ManejadorFalso.Json(Fixtures.ItadBusqueda(("Elden Ring Soundtrack", "dlc"), ("Elden Ring", "game")));
-                return ManejadorFalso.Json(Fixtures.ItadPrecios("35.99", "59.99"));
-            }, CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok, "búsqueda ITAD: se descarta el DLC y se elige el resultado tipo game (el id del DLC no se usa para pedir precios)", Serializacion.AJson(r));
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json("[{\"title\":\"Elden Ring\",\"storeID\":\"25\"}]"));
+            var r = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
+            Verificar(!r.Ok && r.Error == TipoError.FormatoCambiado, "oferta sin salePrice/normalPrice -> formato_cambiado");
         }
         {
-            var (cli, _, _) = Montar((r, n) =>
-            {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no");
-                string ruta = r.RequestUri.AbsolutePath;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup(false));
-                if (ruta.EndsWith("/games/search/v1")) return ManejadorFalso.Json(Fixtures.ItadBusqueda(("ELDEN RING", "game")));
-                return ManejadorFalso.Json(Fixtures.ItadPrecios("35.99", "59.99"));
-            }, CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(r.Ok && r.PrecioActual == 35.99m, "título exacto no encontrado -> búsqueda de ITAD con coincidencia de nombre -> precio", Serializacion.AJson(r));
-            var (cli2, _, _) = Montar((r, n) =>
-            {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no");
-                string ruta = r.RequestUri.AbsolutePath;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup(false));
-                return ManejadorFalso.Json(Fixtures.ItadBusqueda(("Hades", "game"), ("Elden Ring Soundtrack", "dlc")));
-            }, CfgItad);
-            var r2 = new EpicGamesScraper(cli2).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r2.Ok && r2.Error == TipoError.Bloqueo && r2.Detalle!.Contains("ITAD no tiene un juego"), "búsqueda sin coincidencia real (otro título o DLC) -> no se inventa un precio", r2.Detalle);
-        }
-        {
-            var (cli, _, _) = Montar((r, n) =>
-            {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no");
-                string ruta = r.RequestUri.AbsolutePath;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup());
-                return ManejadorFalso.Json(Fixtures.ItadPrecios("35.99", "59.99", moneda: "EUR"));
-            }, CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Detalle!.Contains("moneda EUR"), "moneda distinta de USD -> se rechaza (no se mezclan monedas)", r.Detalle);
-        }
-        {
-            var (cli, _, _) = Montar((r, n) =>
-            {
-                if (r.RequestUri!.Host == "www.cheapshark.com") return ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no");
-                string ruta = r.RequestUri.AbsolutePath;
-                if (ruta.EndsWith("/service/shops/v1")) return ManejadorFalso.Json(Fixtures.ItadTiendas());
-                if (ruta.EndsWith("/games/lookup/v1")) return ManejadorFalso.Json(Fixtures.ItadLookup());
-                return ManejadorFalso.Json("[{\"id\":\"" + Fixtures.ItadGameId + "\",\"deals\":[]}]");
-            }, CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Detalle!.Contains("no tiene precio en Epic"), "ITAD conoce el juego pero no está en Epic -> no_encontrado (sin precio inventado)", r.Detalle);
-        }
-        {
-            var (cli, _, _) = Montar((r, n) => r.RequestUri!.Host == "www.cheapshark.com" ? ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no")
-                                       : ManejadorFalso.Json(Fixtures.ItadTiendas(epic: false)), CfgItad);
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.FormatoCambiado && r.Detalle!.Contains("ITAD no lista a Epic"), "ITAD sin Epic entre sus tiendas -> formato_cambiado con el motivo", r.Detalle);
-        }
-        {
-            // Clave inválida (401): mensaje claro y disyuntor (no se insiste con los demás juegos).
-            var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Texto(HttpStatusCode.Unauthorized, "no"), CfgItad);
-            var epic = new EpicGamesScraper(cli);
-            var r = epic.ConsultarAsync(J("Elden Ring", "PC")).Result;
-            int tras1 = Api(mf).Count(u => u.Contains("isthereanydeal"));
-            var r2 = epic.ConsultarAsync(J("Hades", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.Bloqueo && r.Detalle!.Contains("revise ITAD_API_KEY"), "clave inválida (401) -> mensaje que dice revisar ITAD_API_KEY", r.Detalle);
-            Verificar(!r2.Ok && Api(mf).Count(u => u.Contains("isthereanydeal")) == tras1, "disyuntor de ITAD: tras un rechazo no se vuelve a llamar con los demás juegos");
-        }
-        {
-            // robots.txt de ITAD prohíbe /: se respeta (bloqueo, sin solicitud a la API).
-            var mf = new ManejadorFalso((r, n) =>
-                r.RequestUri!.AbsolutePath == "/robots.txt" ? ManejadorFalso.Texto(HttpStatusCode.OK, "User-agent: *\nDisallow: /\n")
-                : ManejadorFalso.Texto(HttpStatusCode.Forbidden, "no"));
-            var cli = new ClienteHttp(new HttpClient(mf), CfgItad, new LimitadorDominio(4, TimeSpan.Zero), new LogFallosArchivo(null));
-            var r = new EpicGamesScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
-            Verificar(!r.Ok && r.Error == TipoError.Bloqueo && mf.Urls.All(u => u.EndsWith("/robots.txt")), "si el robots.txt lo prohíbe, ni CheapShark ni ITAD reciben solicitudes de API", string.Join(" | ", mf.Urls));
+            var (cli, _, _) = Montar((r, n) => ManejadorFalso.Texto((System.Net.HttpStatusCode)429, "slow down"));
+            var r = new EpicCheapSharkScraper(cli).ConsultarAsync(J("Elden Ring", "PC")).Result;
+            Verificar(!r.Ok && r.Error == TipoError.Bloqueo, "429 (demasiadas solicitudes) -> bloqueo, sin insistir");
         }
 
         Console.WriteLine("== Nintendo eShop ==");
+        {
+            JsonElement H(string json) { using var d = JsonDocument.Parse(json); return d.RootElement.Clone(); }
+            Verificar(NintendoScraper.Imagen(H("{\"productImage\":\"ncom/software/switch/70010000027619/abc123\"}"))
+                          == "https://assets.nintendo.com/image/upload/f_auto,q_auto,w_920/ncom/software/switch/70010000027619/abc123"
+                      && NintendoScraper.Imagen(H("{\"productImage\":\"/content/dam/noa/x.png\"}")) == "https://www.nintendo.com/content/dam/noa/x.png"
+                      && NintendoScraper.Imagen(H("{\"horizontalHeaderImage\":\"https://img/h.jpg\",\"productImage\":\"x\"}")) == "https://img/h.jpg"
+                      && NintendoScraper.Imagen(H("{}")) == null,
+                      "Nintendo: imagen como id del servidor de imágenes, ruta del sitio o URL completa (prefiere la horizontal)");
+        }
         {
             var (cli, mf, _) = Montar((r, n) => ManejadorFalso.Json(Fixtures.NintendoRespuesta("Hades", "Nintendo Switch", "59.99", "39.99")));
             var r = new NintendoScraper(cli).ConsultarAsync(J("Hades", "Switch")).Result;
@@ -643,7 +539,7 @@ public static class AutoTests
         Console.WriteLine("== Tiendas y robustez (cambios y juegos fuera del REPO) ==");
         {
             var (cli, _, _) = Montar((r, n) => ManejadorFalso.Json("{}"));
-            var tiendas = TiendasDisponibles.Crear(cli);
+            var tiendas = TiendasDisponibles.Crear(cli, Array.Empty<string>());   // sin depender de variables de entorno
             Verificar(tiendas.Select(t => t.Tienda).OrderBy(x => x).SequenceEqual(Catalogos.Tiendas.OrderBy(x => x)),
                       "la lista de tiendas coincide con Catalogos.Tiendas (Steam, Epic, Nintendo, Eneba)");
             Verificar(Catalogos.Plataformas.All(p => tiendas.Any(t => t.SoportaPlataforma(p))), "toda plataforma del REPO tiene al menos una tienda");
@@ -851,4 +747,13 @@ public static class AutoTests
         public Task<ResultadoTienda> ConsultarAsync(Juego juego, CancellationToken ct = default) =>
             throw new InvalidOperationException("error de programación simulado");
     }
+}
+
+/// <summary>Limitador de prueba: no espera y registra las pausas mínimas que pide el cliente.</summary>
+internal sealed class LimitadorEspia : ILimitadorSolicitudes
+{
+    public readonly List<TimeSpan> Pausas = new();
+    public Task<IDisposable> EntrarAsync(string dominio, CancellationToken ct = default) => Task.FromResult<IDisposable>(new Nada());
+    public void ExigirPausaMinima(string dominio, TimeSpan pausa) { lock (Pausas) Pausas.Add(pausa); }
+    private sealed class Nada : IDisposable { public void Dispose() { } }
 }

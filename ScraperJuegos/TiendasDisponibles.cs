@@ -21,7 +21,9 @@ public static class TiendasDisponibles
         return new ITiendaScraper[]
         {
             new SteamScraper(http),
-            new EpicGamesScraper(http),
+            // Epic: store.epicgames.com responde 403 y no se evade; los precios de Epic se leen de la API pública de CheapShark.
+            // (EpicGamesScraper, el acceso directo, se conserva en el código como evidencia, pero no se registra.)
+            new EpicCheapSharkScraper(http),
             new NintendoScraper(http),
             new EnebaScraper(http),
         }.Where(t => !apagadas.Contains(t.Tienda)).ToArray();

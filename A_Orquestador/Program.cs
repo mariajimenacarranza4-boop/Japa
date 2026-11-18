@@ -23,11 +23,11 @@ var argReps = args.FirstOrDefault(a => a.StartsWith("reps=", StringComparison.Or
 int REPETICIONES = argReps != null && int.TryParse(argReps[5..], out var rr) && rr > 0 ? rr : 3;
 
 bool real = args.Length > 0 && args[0].Equals("real", StringComparison.OrdinalIgnoreCase);
-// Ruta del CSV: argumento, o ..\ScraperJuegos_v8\Data (si se corre desde esta carpeta), o relativa al .exe (funciona desde cualquier carpeta).
-string rutaCsv = args.Length > 1 && !args[1].Contains('=') ? args[1] : Path.Combine("..", "ScraperJuegos_v8", "Data", "juegos.csv");
+// Ruta del CSV: argumento, o ..\ScraperJuegos\Data (si se corre desde esta carpeta), o relativa al .exe (funciona desde cualquier carpeta).
+string rutaCsv = args.Length > 1 && !args[1].Contains('=') ? args[1] : Path.Combine("..", "ScraperJuegos", "Data", "juegos.csv");
 if (!File.Exists(rutaCsv))
 {
-    string alt = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "ScraperJuegos_v8", "Data", "juegos.csv"));
+    string alt = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "ScraperJuegos", "Data", "juegos.csv"));
     if (File.Exists(alt)) rutaCsv = alt;
 }
 // Sin número: "real" procesa TODOS los juegos del REPO (actualización automática); "medir" usa 3 por defecto.

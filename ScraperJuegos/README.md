@@ -4,7 +4,7 @@ Requisito: .NET 8 SDK.
 
 ```
 dotnet run                                  # valida el REPO (juegos distintos, errores, cobertura de tiendas)
-dotnet run -- autotest                      # pruebas sin internet (REPO, nombres, oferta, las 4 tiendas, Epic vía CheapShark, errores, robots...)
+dotnet run -- autotest                      # pruebas sin internet (REPO, nombres, oferta, las 4 tiendas, errores, robots...)
 dotnet run -- probar 10                     # las 4 tiendas + Metacritic + HLTB contra los sitios REALES sobre 10 juegos
 dotnet run -- probar 3 --juego "Elden Ring" # un juego concreto (también: --plataforma PS5)
 dotnet run -- probar --juego "Juego Nuevo" --precio 49.99   # juego que NO está en el REPO: se consulta igual (sin tocar el CSV)
@@ -21,9 +21,8 @@ dotnet run -- exportar                      # salida/repo_juegos.json (para carg
 ```
 
 Opciones: `--repo RUTA.csv`, `--salida carpeta`, `--plataforma`, `--precio`, `--anio` (estas tres para juegos fuera del REPO).
-Tiendas apagables con la variable `TIENDAS_DESACTIVADAS` (ej. `$env:TIENDAS_DESACTIVADAS="Eneba"`): una tienda caída o bloqueada, apagada, no gasta solicitudes ni ensucia las mediciones.
-Tiendas: Steam, Epic Games Store, Nintendo eShop y Eneba (lista única en `TiendasDisponibles.cs`).
-Epic Games Store se consulta **vía la API pública de CheapShark** (store.epicgames.com responde 403): se busca su id por nombre en `/api/1.0/stores` (o se fija con `CHEAPSHARK_EPIC_STORE_ID`), respeta robots.txt, pide 1 solicitud/s y, si CheapShark bloquea, deja de insistir unos minutos. **Respaldo:** si CheapShark falla y existe `ITAD_API_KEY` (clave gratuita de isthereanydeal.com/apps), Epic se consulta con la API oficial de IsThereAnyDeal.
+Tiendas apagables con la variable `TIENDAS_DESACTIVADAS` (ej. `$env:TIENDAS_DESACTIVADAS="Epic Games Store"`): Epic responde 403; apagada no gasta solicitudes ni ensucia las mediciones.
+Tiendas: Steam, Epic Games Store (vía la API pública de CheapShark, porque la tienda directa responde 403), Nintendo eShop y Eneba (lista única en `TiendasDisponibles.cs`).
 Si Nintendo rota su clave pública de búsqueda: variable `NINTENDO_ALGOLIA_KEY` (sin recompilar). Defina `SCRAPER_CONTACTO` (su correo) para un User-Agent completo.
 Salidas: `salida/prueba_scrapers.json` (formato del Contrato 1) y `salida/fallos.log`.
 

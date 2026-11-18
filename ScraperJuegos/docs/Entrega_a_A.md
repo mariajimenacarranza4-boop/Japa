@@ -18,8 +18,7 @@ Valores por defecto de `LimitadorDominio` (A puede inyectar el suyo con la misma
 | Dominio | Máx. simultáneas | Pausa mínima entre solicitudes |
 |---|---|---|
 | store.steampowered.com | 2 | 1 s |
-| www.cheapshark.com (Epic Games Store vía su API pública; ver 3.1) | 2 | 1 s |
-| api.isthereanydeal.com (respaldo de Epic con clave; solo si ITAD_API_KEY existe) | 2 | 1 s |
+| store.epicgames.com (apagada, responde 403) | 2 | 1 s |
 | www.nintendo.com | 2 | 1 s |
 | www.eneba.com | 2 | 1 s |
 | metacritic.com | 2 | 1 s |

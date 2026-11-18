@@ -22,6 +22,12 @@ public sealed class ClienteHttp
     private readonly ILogFallos _log;
     private readonly RobotsTxt _robots;
 
+    // Ritmo adaptativo: si un sitio responde 429 (demasiadas solicitudes), se DUPLICA la pausa mínima de ese dominio
+    // para TODOS los hilos (2 s, 4 s, hasta 5 s). Así se hace caso al sitio en vez de seguir chocando con el límite.
+    // Tope de 5 s: con 8–10 s una corrida completa pasaba de 100 minutos (≈660 solicitudes a Eneba), con 5 s queda en ≈1 h.
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, TimeSpan> _pausaPor429 = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly TimeSpan PausaMaxPor429 = TimeSpan.FromSeconds(5);
+
     public ConfigScraping Config => _cfg;
     public ILogFallos Log => _log;
 
@@ -94,6 +100,7 @@ public sealed class ClienteHttp
                 {
                     esperaServidor = resp.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(5);
                     tipoFinal = TipoError.Bloqueo; ultimoDetalle = "HTTP 429: demasiadas solicitudes";
+                    BajarRitmo(uri.Host, ctx);
                 }
                 else if (code >= 500)
                 {
@@ -139,5 +146,15 @@ public sealed class ClienteHttp
             || cuerpo.Contains("g-recaptcha", StringComparison.OrdinalIgnoreCase)
             || cuerpo.Contains("Access Denied", StringComparison.OrdinalIgnoreCase)
             || cuerpo.Contains("Are you a robot", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Tras un 429, duplica la pausa mínima del dominio (compartida por todos los hilos). Nunca la baja.</summary>
+    private void BajarRitmo(string host, ContextoLog ctx)
+    {
+        var nueva = _pausaPor429.AddOrUpdate(host, TimeSpan.FromSeconds(2),
+            (_, actual) => actual * 2 > PausaMaxPor429 ? PausaMaxPor429 : actual * 2);
+        _limitador.ExigirPausaMinima(host, nueva);
+        _log.Registrar(ctx.Juego, ctx.Plataforma, ctx.Fuente, "ritmo",
+            $"{host} pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora {nueva.TotalSeconds:0} s");
     }
 }

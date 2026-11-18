@@ -1,4 +1,3 @@
 <Solution>
-  <Project Path="../A_Orquestador/A_Orquestador.csproj" />
   <Project Path="ScraperJuegos.csproj" />
 </Solution>

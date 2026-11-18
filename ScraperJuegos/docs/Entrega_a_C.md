@@ -12,12 +12,12 @@ Plataformas en el REPO actual (filas): PC 194, Switch 121, PS5 95, PS4 92, Xbox 
 ## 2. Avisos para armar la interfaz
 - **Formato físico:** las tiendas implementadas solo venden digital, así que "fisico" no tendrá resultados. El filtro puede existir,
   pero hay que mostrar "sin resultados" y no un error (la limitación está en 3.6 de `Documentacion_B.md`).
-- **Epic Games Store** se consulta vía CheapShark; si CheapShark no responde o bloquea, no aparece ningún precio de esa tienda. Mostrar el filtro solo con las tiendas
+- **Epic Games Store** ahora se obtiene vía CheapShark (la tienda directa responde 403). Si CheapShark falla, puede no aparecer ningún precio de esa tienda. Mostrar el filtro solo con las tiendas
   que tengan datos, o dejarlo sin resultados sin romper nada.
 - **Un juego es una fila por plataforma** en el REPO (660 filas, 249 juegos distintos). Para la tarjeta de un juego con varias
   consolas, agrupar por nombre normalizado y mostrar las consolas como etiquetas.
 - **Datos faltantes:** si un juego no tiene Metacritic u HLTB, mostrar "N/D" (los campos llegan sin valor porque el JSON omite los nulos).
-- **Cobertura de precios:** PC = Steam + Epic (vía CheapShark) + Eneba; Switch = Nintendo eShop + Eneba; PS4/PS5/Xbox = solo Eneba.
+- **Cobertura de precios:** PC = Steam + Eneba; Switch = Nintendo eShop + Eneba; PS4/PS5/Xbox = solo Eneba.
   Hay juegos con una sola tienda; la tarjeta debe funcionar igual (mejor precio entre las que hay).
 - **Atribución obligatoria:** mostrar "Fuente: HowLongToBeat" donde aparezca el tiempo de juego.
 

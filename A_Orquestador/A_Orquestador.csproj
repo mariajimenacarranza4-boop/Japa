@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Proyecto de B. Ajustar la ruta si las carpetas no quedan como hermanas. -->
-    <ProjectReference Include="..\ScraperJuegos_v8\ScraperJuegos.csproj" />
+    <!-- Proyecto de B. Carpeta hermana ../ScraperJuegos (en el repositorio de GitHub). -->
+    <ProjectReference Include="../ScraperJuegos/ScraperJuegos.csproj" />
   </ItemGroup>
 
 </Project>
