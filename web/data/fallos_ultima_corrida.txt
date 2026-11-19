@@ -1,17 +1,17 @@
-Fallos de la última corrida (2026-11-19 01:32 UTC) — total: 697
+Fallos de la última corrida (2026-11-19 16:56 UTC) — total: 718
 
-Eneba                  no_encontrado      386
+Eneba                  no_encontrado      388
     - Elden Ring [PS5]: 'Elden Ring' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Elden Ring (PC) Steam Key UNITED STATES | Elden Ring XBOX LIVE Key UNITED STATES | Elden Ring (PC) Steam Key NORTH AMERICA | Elden Ring (PC) Steam Key LATAM
     - Cyberpunk 2077 [PS5]: 'Cyberpunk 2077' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Cyberpunk 2077 (Xbox One) Xbox Live Key UNITED STATES | Cyberpunk 2077: Ultimate Edition Xbox Live (Xbox X|S) Key UNITED STATES | Cyberpunk 2077: Ultimate Edition (PC) GOG Key GLOBAL | Cyb
     - Hogwarts Legacy [PS5]: 'Hogwarts Legacy' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Hogwarts Legacy Steam Key (PC) GLOBAL | Hogwarts Legacy (Xbox One) Xbox Live Key UNITED STATES | Hogwarts Legacy Deluxe Edition (PC) Steam Key UNITED STATES | Hogwarts Legacy Deluxe Editi
-Eneba                  ritmo              118
-    - Starfield [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 2 s
-    - God of War Ragnarök [PS5]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 4 s
-    - God of War Ragnarök [PC]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 5 s
-Eneba                  reintento          117
+Eneba                  ritmo              128
+    - Baldur's Gate 3 [PC]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 2 s
+    - Starfield [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 4 s
+    - God of War Ragnarök [PS5]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 5 s
+Eneba                  reintento          128
+    - Baldur's Gate 3 [PC]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
     - Starfield [Xbox Series]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
     - God of War Ragnarök [PS5]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
-    - God of War Ragnarök [PC]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
 Metacritic             no_encontrado       36
     - Horizon Forbidden West [PC]: la página es de PlayStation 5/PlayStation 4, no de PC
     - Ghost of Tsushima [PC]: la página es de PlayStation 4, no de PC
@@ -23,7 +23,3 @@ HowLongToBeat          no_encontrado       36
 Steam                  no_encontrado        2
     - Alan Wake 2 [PC]: ningún resultado de Steam coincide con 'Alan Wake 2' (se evaluaron 1)
     - F1 24 [PC]: el juego no tiene precio en Steam (gratis, no lanzado o retirado)
-Eneba                  bloqueo              1
-    - Stardew Valley [Xbox One]: HTTP 429: demasiadas solicitudes (tras 4 intentos)
-Eneba                  formato_cambiado     1
-    - Dragon Ball FighterZ [Switch]: los bloques JSON de Eneba no contienen productos con precio y moneda (¿cambió el formato o no hubo resultados?)
