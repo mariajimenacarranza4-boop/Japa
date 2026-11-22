@@ -1,17 +1,17 @@
-Fallos de la última corrida (2026-11-22 00:30 UTC) — total: 724
+Fallos de la última corrida (2026-11-22 15:47 UTC) — total: 723
 
-Eneba                  no_encontrado      385
-    - Elden Ring [PS5]: 'Elden Ring' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Elden Ring (PC) Steam Key UNITED STATES | Elden Ring XBOX LIVE Key UNITED STATES | Elden Ring (PC) Steam Key LATAM | Elden Ring XBOX LIVE Key GLOBAL
+Eneba                  no_encontrado      387
+    - Cyberpunk 2077 [PS5]: 'Cyberpunk 2077' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Cyberpunk 2077: Ultimate Edition (PC) GOG Key GLOBAL | Cyberpunk 2077: Ultimate Edition Xbox Live (Xbox X|S) Key UNITED STATES | Cyberpunk 2077 (Xbox One) Xbox Live Key UNITED STATES | Cyb
     - Hogwarts Legacy [PS5]: 'Hogwarts Legacy' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Hogwarts Legacy Steam Key (PC) GLOBAL | Hogwarts Legacy (Xbox One) Xbox Live Key UNITED STATES | Hogwarts Legacy Deluxe Edition (PC) Steam Key UNITED STATES | Hogwarts Legacy Deluxe Editi
-    - Hogwarts Legacy [PC]: los precios de Eneba para 'Hogwarts Legacy' (4.98 USD) son anómalos frente al sugerido del REPO (69.99 USD), se descartan
-Eneba                  ritmo              132
-    - Starfield [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 2 s
-    - Starfield [PC]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 4 s
-    - God of War Ragnarök [PS5]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 5 s
+    - Elden Ring [PS5]: 'Elden Ring' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Elden Ring (PC) Steam Key UNITED STATES | Elden Ring XBOX LIVE Key UNITED STATES | Elden Ring (PC) Steam Key LATAM | Elden Ring XBOX LIVE Key GLOBAL
 Eneba                  reintento          132
+    - Elden Ring [Xbox Series]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
+    - Hogwarts Legacy [Xbox Series]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
     - Starfield [Xbox Series]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
-    - Starfield [PC]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
-    - God of War Ragnarök [PS5]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
+Eneba                  ritmo              130
+    - Elden Ring [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 2 s
+    - Hogwarts Legacy [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 4 s
+    - Starfield [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 5 s
 Metacritic             no_encontrado       36
     - Horizon Forbidden West [PC]: la página es de PlayStation 5/PlayStation 4, no de PC
     - Ghost of Tsushima [PC]: la página es de PlayStation 4, no de PC
@@ -23,5 +23,3 @@ HowLongToBeat          no_encontrado       36
 Steam                  no_encontrado        2
     - Alan Wake 2 [PC]: ningún resultado de Steam coincide con 'Alan Wake 2' (se evaluaron 1)
     - F1 24 [PC]: el juego no tiene precio en Steam (gratis, no lanzado o retirado)
-Eneba                  formato_cambiado     1
-    - Sonic Mania [PS4]: los bloques JSON de Eneba no contienen productos con precio y moneda (¿cambió el formato o no hubo resultados?)
