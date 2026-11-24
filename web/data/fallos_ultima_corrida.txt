@@ -1,17 +1,17 @@
-Fallos de la última corrida (2026-11-23 19:29 UTC) — total: 725
+Fallos de la última corrida (2026-11-24 18:59 UTC) — total: 692
 
 Eneba                  no_encontrado      387
-    - Cyberpunk 2077 [PS5]: 'Cyberpunk 2077' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Cyberpunk 2077: Ultimate Edition (PC) GOG Key GLOBAL | Cyberpunk 2077: Ultimate Edition Xbox Live (Xbox X|S) Key UNITED STATES | Cyberpunk 2077 (Xbox One) Xbox Live Key UNITED STATES | Cyb
-    - Baldur's Gate 3 [PS5]: 'Baldur's Gate 3' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Baldur's Gate 3 (Xbox Series X|S) Xbox Live Key  UNITED STATES | Baldur's Gate 3 (PC) GOG Key GLOBAL | Baldur's Gate 3 - Digital Deluxe Edition (Xbox Series X|S) Xbox Live Key GLOBAL | Ba
+    - Hogwarts Legacy [PS5]: 'Hogwarts Legacy' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Hogwarts Legacy Steam Key (PC) GLOBAL | Hogwarts Legacy (Xbox One) Xbox Live Key UNITED STATES | Hogwarts Legacy Deluxe Edition (PC) Steam Key UNITED STATES | Hogwarts Legacy Deluxe Editi
     - Elden Ring [PS5]: 'Elden Ring' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Elden Ring (PC) Steam Key UNITED STATES | Elden Ring XBOX LIVE Key UNITED STATES | Elden Ring (PC) Steam Key LATAM | Elden Ring XBOX LIVE Key GLOBAL
-Eneba                  ritmo              132
-    - Cyberpunk 2077 [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 2 s
-    - Hogwarts Legacy [PS5]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 4 s
-    - Starfield [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 5 s
-Eneba                  reintento          132
+    - Cyberpunk 2077 [PS5]: 'Cyberpunk 2077' aparece en Eneba pero no se pudo confirmar una clave para PS5 (no se adivina). Títulos vistos: Cyberpunk 2077: Ultimate Edition (PC) GOG Key GLOBAL | Cyberpunk 2077: Ultimate Edition Xbox Live (Xbox X|S) Key UNITED STATES | Cyberpunk 2077 (Xbox One) Xbox Live Key UNITED STATES | Cyb
+Eneba                  reintento          119
+    - Baldur's Gate 3 [Xbox Series]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
     - Cyberpunk 2077 [Xbox Series]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
-    - Hogwarts Legacy [PS5]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
     - Starfield [Xbox Series]: intento 1/4 falló (HTTP 429: demasiadas solicitudes), espera 5.0s
+Eneba                  ritmo              112
+    - Baldur's Gate 3 [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 2 s
+    - Cyberpunk 2077 [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 4 s
+    - Starfield [Xbox Series]: www.eneba.com pidió ir más lento (HTTP 429): pausa mínima entre solicitudes ahora 5 s
 Metacritic             no_encontrado       36
     - Horizon Forbidden West [PC]: la página es de PlayStation 5/PlayStation 4, no de PC
     - Ghost of Tsushima [PC]: la página es de PlayStation 4, no de PC
